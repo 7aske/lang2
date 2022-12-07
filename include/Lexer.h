@@ -23,12 +23,15 @@ namespace Lang {
  */
 static const int max_identifier_length = 256;
 
-class Lexer : public Iterator::Indexed_Char_Iterator {
+class Lexer : public Indexed_Char_Iterator {
 public:
-	explicit Lexer(std::string& text);
-	~Lexer() = default;
+	explicit Lexer(std::string const& text);
+
+	~Lexer() override = default;
 
 	void lex();
+
+	[[nodiscard]] std::vector<Token> const& get_tokens() const;
 
 private:
 
@@ -36,28 +39,40 @@ private:
 
 	std::shared_ptr<std::string> buffer;
 
-	std::vector<Token::Token> tokens;
+	std::vector<Token> tokens;
 
 	bool is_startof_line_comment();
 
-	Lang::Token::Type parse_operator();
-	Token::Token parse_keyword();
+	TokenType parse_operator();
+
+	Token parse_keyword();
+
 	bool is_startof_identifier();
-	void emit_token(const Lang::Token::Token& token);
+
+	void emit_token(const Token& token);
+
 	bool is_startof_string();
-	Lang::Token::Token parse_string();
+
+	Token parse_string();
+
 	bool is_startof_number();
-	Token::Token parse_number();
-	char resolve_escape_sequence(const char);
+
+	Token parse_number();
+
+	[[nodiscard]] char resolve_escape_sequence(char) const;
+
 	bool is_startof_char();
-	Token::Token parse_char();
+
+	Token parse_char();
 };
 
 class Lexer_Error : public std::exception {
 public:
-	explicit Lexer_Error(const char* msg) : msg(msg) {}
+	explicit Lexer_Error(const char* msg)
+			: msg(msg) {}
 
-	const char* what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW override {
+	[[nodiscard]] const char*
+	what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW override {
 		return msg;
 	}
 
@@ -67,27 +82,28 @@ protected:
 
 class Lexer_Token_Error : public Lexer_Error {
 public:
-	Lexer_Token_Error(const char* msg, const Lang::Token::Token& token) : Lexer_Error(msg), token(token) {}
+	Lexer_Token_Error(const char* msg, const Token& token)
+			: Lexer_Error(msg), token(token) {}
 
-	const Lang::Token::Token& get_token() const { return token; }
+	[[nodiscard]] const Token& get_token() const { return token; }
 
 protected:
-	const Lang::Token::Token token;
+	const Token token;
 };
 
 class Lexer_Location_Error : public Lexer_Error {
 public:
 	Lexer_Location_Error(const char* msg, int row, int start_col, int end_col)
-		: Lexer_Error(msg)
-		  , row(row)
-		  , start_col(start_col)
-		  , end_col(end_col) {}
+			: Lexer_Error(msg)
+			  , row(row)
+			  , start_col(start_col)
+			  , end_col(end_col) {}
 
-	const int get_row() const { return row; }
+	[[nodiscard]] int get_row() const { return row; }
 
-	const int get_start_col() const { return start_col; }
+	[[nodiscard]] int get_start_col() const { return start_col; }
 
-	const int get_end_col() const { return end_col; }
+	[[nodiscard]] int get_end_col() const { return end_col; }
 
 protected:
 	const int row;

@@ -9,7 +9,7 @@
 #include <iterator>
 #include <exception>
 
-namespace Lang::Iterator {
+namespace Lang {
 
 template<typename T>
 class Iterator {
@@ -48,15 +48,19 @@ public:
 		return iter < end;
 	}
 
+	virtual ~String_Iterator() = default;
+
 protected:
+	const std::string text;
+
+private:
 	iterator iter;
 	iterator end;
-	const std::string text;
 };
 
 class Indexed_Char_Iterator : public String_Iterator {
 public:
-	explicit Indexed_Char_Iterator(std::string& text) : String_Iterator(text) {}
+	using String_Iterator::String_Iterator;
 
 	char next() override {
 		char next = String_Iterator::next();
@@ -71,14 +75,9 @@ public:
 		return next;
 	}
 
-	bool has_next() override {
-		return String_Iterator::has_next();
-	}
-
 protected:
 	int row = 0;
 	int col = 0;
-
 };
 
 }

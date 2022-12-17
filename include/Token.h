@@ -7,82 +7,82 @@
 #ifndef LANG2_TOKEN_H
 #define LANG2_TOKEN_H
 
-#include <map>
+#include <unordered_map>
 #include <string>
 #include <cstring>
 #include <ostream>
-
-#undef NULL // shouldn't be used anyway
 
 namespace Lang {
 
 enum class TokenType {
 	INVALID = 0,
-	WHILE,       // while
-	IF,          // if
-	ELSE,        // else
-	FOR,         // for
-	FOREACH,     // foreach
-	IN,          // in
-	CONTINUE,    // continue
-	BREAK,       // break
-	TRUE,        // true
-	FALSE,       // false
-	NULL,        // null
-	IMPORT,      // import
-	INCL,        // include
-	AS,          // as
-	FN,          // fn
-	RETURN,      // return
-	FAT_ARROW,   // =>
-	THIN_ARROW,  // ->
-	ASSN,        // =
-	DQM,         // ??
-	QM,          // ?
-	COL,         // :
-	ADD,         // +
-	SUB,         // -
-	DIV,         // /
-	STAR,        // *
-	STARSTAR,    // **
-	MOD,         // %
-	AMP,         // &
-	AND,         // &&
-	CARET,       // ^
-	PIPE,        // |
-	OR,          // ||
-	NOT,         // !
-	EQ,          // ==
-	NE,          // !=
-	GT,          // >=
-	LT,          // <=
-	GE,          // >
-	LE,          // <
-	LSHIFT,      // <<
-	RSHIFT,      // >>
-	TILDE,       // ~
-	INC,         // ++
-	DEC,         // --
-	SUBASSN,     // -=
-	ADDASSN,     // +=
-	MULASSN,     // *=
-	DIVASSN,     // /=
-	DOT,         // .
-	DDOT,        // ..
-	COMMA,       // ,
-	SCOL,        // ;
-	LPAREN,      // (
-	RPAREN,      // )
-	LBRACE,      // {
-	RBRACE,      // }
-	LBRACK,      // [
-	RBRACK,      // ]
+	SUPER,                     // super
+	CLASS,                     // class
+	THIS,                      // this
+	WHILE,                     // while
+	IF,                        // if
+	ELSE,                      // else
+	FOR,                       // for
+	FOREACH,                   // foreach
+	IN,                        // in
+	CONTINUE,                  // continue
+	BREAK,                     // break
+	TRUE,                      // true
+	FALSE,                     // false
+	NIL,                       // nil
+	IMPORT,                    // import
+	INCL,                      // include
+	AS,                        // as
+	FN,                        // fn
+	RETURN,                    // return
+	FAT_ARROW,                 // =>
+	THIN_ARROW,                // ->
+	EQUAL,                     // =
+	QUESTIONMARK_QUESTIONMARK, // ??
+	QUESTIONMARK,              // ?
+	COLON,                     // :
+	PLUS,                      // +
+	MINUS,                     // -
+	SLASH,                     // /
+	STAR,                      // *
+	STAR_STAR,                 // **
+	PERCENT,                   // %
+	AMPERSAND,                 // &
+	AMPERSAND_AMPERSAND,       // &&
+	CARET,                     // ^
+	PIPE,                      // |
+	PIPE_PIPE,                 // ||
+	BANG,                      // !
+	EQUAL_EQUAL,               // ==
+	BANG_EQUAL,                // !=
+	GREATER_EQUAL,             // >=
+	LESS_EQUAL,                // <=
+	GREATER,                   // >
+	LESS,                      // <
+	LESS_LESS,                 // <<
+	GREATER_GREATER,           // >>
+	TILDE,                     // ~
+	PLUS_PLUS,                 // ++
+	MINUS_MINUS,               // --
+	MINUS_EQUAL,               // -=
+	PLUS_EQUAL,                // +=
+	STAR_EQUAL,                // *=
+	SLASH_EQUAL,               // /=
+	DOT,                       // .
+	DOT_DOT,                   // ..
+	COMMA,                     // ,
+	SEMICOLON,                 // ;
+	LEFT_PARENTHESIS,          // (
+	RIGHT_PARENTHESIS,         // )
+	LEFT_BRACE,                // {
+	RIGHT_BRACE,               // }
+	LEFT_BRACKET,              // [
+	RIGHT_BRACKET,             // ]
 	IDENTIFIER,
-	LIT_STR,
-	LIT_CHR,
-	LIT_INT,
-	LIT_FLT,
-	LIT_BOOL,
+	STRING,
+	CHAR,
+	INTEGER,
+	FLOAT,
 	__TOK_SIZE,
 };
 
@@ -103,83 +103,79 @@ struct Token {
 	int end_char = 0;
 };
 
-static const std::map<TokenType, char const*> types = {
-		{TokenType::INVALID,    "TOK_INVALID",},
-		{TokenType::WHILE,      "while",},
-		{TokenType::IF,         "if",},
-		{TokenType::ELSE,       "else",},
-		{TokenType::FOR,        "for",},
-		{TokenType::FOREACH,    "foreach",},
-		{TokenType::IN,         "in",},
-		{TokenType::CONTINUE,   "continue",},
-		{TokenType::BREAK,      "break",},
-		{TokenType::TRUE,       "true",},
-		{TokenType::FALSE,      "false",},
-		{TokenType::NULL,       "null",},
-		{TokenType::IMPORT,     "import",},
-		{TokenType::INCL,       "include",},
-		{TokenType::AS,         "as",},
-		{TokenType::FN,         "fn",},
-		{TokenType::RETURN,     "return",},
-		{TokenType::FAT_ARROW,  "=>",},
-		{TokenType::THIN_ARROW, "->",},
-		{TokenType::ASSN,       "=",},
-		{TokenType::DQM,        "??",},
-		{TokenType::QM,         "?",},
-		{TokenType::COL,        ":",},
-		{TokenType::ADD,        "+",},
-		{TokenType::SUB,        "-",},
-		{TokenType::DIV,        "/",},
-		{TokenType::STAR,       "*",},
-		{TokenType::STARSTAR,   "**",},
-		{TokenType::MOD,        "%",},
-		{TokenType::AMP,        "&",},
-		{TokenType::AND,        "&&",},
-		{TokenType::CARET,      "^",},
-		{TokenType::PIPE,       "|",},
-		{TokenType::OR,         "||",},
-		{TokenType::NOT,        "!",},
-		{TokenType::EQ,         "==",},
-		{TokenType::NE,         "!=",},
-		{TokenType::GT,         ">=",},
-		{TokenType::LT,         "<=",},
-		{TokenType::GE,         ">",},
-		{TokenType::LE,         "<",},
-		{TokenType::LSHIFT,     "<<",},
-		{TokenType::RSHIFT,     ">>",},
-		{TokenType::TILDE,      "~",},
-		{TokenType::INC,        "++",},
-		{TokenType::DEC,        "--",},
-		{TokenType::SUBASSN,    "-=",},
-		{TokenType::ADDASSN,    "+=",},
-		{TokenType::MULASSN,    "*=",},
-		{TokenType::DIVASSN,    "/=",},
-		{TokenType::DOT,        ".",},
-		{TokenType::DDOT,       "..",},
-		{TokenType::COMMA,      ",",},
-		{TokenType::SCOL,       ";",},
-		{TokenType::LPAREN,     "(",},
-		{TokenType::RPAREN,     ")",},
-		{TokenType::LBRACE,     "{",},
-		{TokenType::RBRACE,     "}",},
-		{TokenType::LBRACK,     "[",},
-		{TokenType::RBRACK,     "]",},
-		{TokenType::IDENTIFIER, "TOK_IDEN",},
-		{TokenType::LIT_STR,    "TOK_LIT_STR",},
-		{TokenType::LIT_CHR,    "TOK_LIT_CHR",},
-		{TokenType::LIT_INT,    "TOK_LIT_INT",},
-		{TokenType::LIT_FLT,    "TOK_LIT_FLT",},
-		{TokenType::LIT_BOOL,   "TOK_LIT_BOOL",},
+static const std::unordered_map<std::string, TokenType> types = {
+		{"class",    TokenType::CLASS,},
+		{"super",    TokenType::SUPER,},
+		{"this",     TokenType::THIS,},
+		{"while",    TokenType::WHILE,},
+		{"if",       TokenType::IF,},
+		{"else",     TokenType::ELSE,},
+		{"for",      TokenType::FOR,},
+		{"foreach",  TokenType::FOREACH,},
+		{"in",       TokenType::IN,},
+		{"continue", TokenType::CONTINUE,},
+		{"break",    TokenType::BREAK,},
+		{"true",     TokenType::TRUE,},
+		{"false",    TokenType::FALSE,},
+		{"nil",      TokenType::NIL,},
+		{"import",   TokenType::IMPORT,},
+		{"include",  TokenType::INCL,},
+		{"as",       TokenType::AS,},
+		{"fn",       TokenType::FN,},
+		{"return",   TokenType::RETURN,},
+		{"=>",       TokenType::FAT_ARROW,},
+		{"->",       TokenType::THIN_ARROW,},
+		{"=",        TokenType::EQUAL,},
+		{"??",       TokenType::QUESTIONMARK_QUESTIONMARK,},
+		{"?",        TokenType::QUESTIONMARK,},
+		{":",        TokenType::COLON,},
+		{"+",        TokenType::PLUS,},
+		{"-",        TokenType::MINUS,},
+		{"/",        TokenType::SLASH,},
+		{"*",        TokenType::STAR,},
+		{"**",       TokenType::STAR_STAR,},
+		{"%",        TokenType::PERCENT,},
+		{"&",        TokenType::AMPERSAND,},
+		{"&&",       TokenType::AMPERSAND_AMPERSAND,},
+		{"^",        TokenType::CARET,},
+		{"|",        TokenType::PIPE,},
+		{"||",       TokenType::PIPE_PIPE,},
+		{"!",        TokenType::BANG,},
+		{"==",       TokenType::EQUAL_EQUAL,},
+		{"!=",       TokenType::BANG_EQUAL,},
+		{">=",       TokenType::GREATER_EQUAL,},
+		{"<=",       TokenType::LESS_EQUAL,},
+		{">",        TokenType::GREATER,},
+		{"<",        TokenType::LESS,},
+		{"<<",       TokenType::LESS_LESS,},
+		{">>",       TokenType::GREATER_GREATER,},
+		{"~",        TokenType::TILDE,},
+		{"++",       TokenType::PLUS_PLUS,},
+		{"--",       TokenType::MINUS_MINUS,},
+		{"-=",       TokenType::MINUS_EQUAL,},
+		{"+=",       TokenType::PLUS_EQUAL,},
+		{"*=",       TokenType::STAR_EQUAL,},
+		{"/=",       TokenType::SLASH_EQUAL,},
+		{".",        TokenType::DOT,},
+		{"..",       TokenType::DOT_DOT,},
+		{",",        TokenType::COMMA,},
+		{";",        TokenType::SEMICOLON,},
+		{"(",        TokenType::LEFT_PARENTHESIS,},
+		{")",        TokenType::RIGHT_PARENTHESIS,},
+		{"{",        TokenType::LEFT_BRACE,},
+		{"}",        TokenType::RIGHT_BRACE,},
+		{"[",        TokenType::LEFT_BRACKET,},
+		{"]",        TokenType::RIGHT_BRACKET,},
 };
 
-static TokenType find_by_value(const char* val) {
-	for (const auto [first, second]: types) {
-		if (strcmp(second, val) == 0) {
+static const std::string& find_by_value(TokenType val) {
+	for (const auto& [first, second]: types) {
+		if (second == val) {
 			return first;
 		}
 	}
 
-	return TokenType::INVALID;
+	throw std::runtime_error("Unable to find token type value");
 }
 
 }

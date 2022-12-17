@@ -6,7 +6,8 @@
 
 namespace Lang {
 
-Lexer::Lexer(std::string const& text) : Indexed_Char_Iterator(text) {
+Lexer::Lexer(std::string const& text)
+		: Indexed_Char_Iterator(text) {
 	this->buffer.reserve(max_identifier_length);
 	this->tokens.reserve(2048);
 }
@@ -35,14 +36,17 @@ void Lang::Lexer::do_lex() {
 			auto token = parse_keyword();
 			emit_token(token);
 		} else {
+
 			auto type = parse_operator();
 
-			auto keyword = types.at(type);
-
-			int offset = 1;
-			if (type != TokenType::INVALID) {
-				offset = (int) strlen(keyword);
+			if (type == TokenType::INVALID) {
+				throw Lexer_Location_Error("Invalid token", row,
+										   col, col + 1);
 			}
+
+			auto const& keyword = find_by_value(type);
+
+			auto offset = (int) keyword.size();
 
 			auto token = Token(type,
 							   keyword,
@@ -62,41 +66,42 @@ inline bool Lang::Lexer::is_startof_line_comment() {
 
 
 TokenType Lexer::parse_operator() {
-	using enum Lang::TokenType;
+	using
+	enum Lang::TokenType;
 
 	char c = next();
 	if (c == '!') {
 		if (peek() == '=') {
 			next();
-			return NE;
+			return BANG_EQUAL;
 		} else {
-			return NOT;
+			return BANG;
 		}
 	}
 
-	if (c == '%') { return MOD; }
+	if (c == '%') { return PERCENT; }
 	if (c == '&') {
 		if (peek() == '&') {
 			next();
-			return AND;
+			return AMPERSAND_AMPERSAND;
 		} else {
-			return AMP;
+			return AMPERSAND;
 		}
 	}
 
 	if (c == '(') {
-		return LPAREN;
+		return LEFT_PARENTHESIS;
 	}
 	if (c == ')') {
-		return RPAREN;
+		return RIGHT_PARENTHESIS;
 	}
 	if (c == '*') {
 		if (peek() == '=') {
 			next();
-			return MULASSN;
+			return STAR_EQUAL;
 		} else if (peek() == '*') {
 			next();
-			return STARSTAR;
+			return STAR_STAR;
 		} else {
 			return STAR;
 		}
@@ -104,12 +109,12 @@ TokenType Lexer::parse_operator() {
 	if (c == '+') {
 		if (peek() == '+') {
 			next();
-			return INC;
+			return PLUS_PLUS;
 		} else if (peek() == '=') {
 			next();
-			return ADDASSN;
+			return PLUS_EQUAL;
 		} else {
-			return ADD;
+			return PLUS;
 		}
 	}
 	if (c == ',') {
@@ -118,21 +123,21 @@ TokenType Lexer::parse_operator() {
 	if (c == '-') {
 		if (peek() == '-') {
 			next();
-			return DEC;
+			return MINUS_MINUS;
 		} else if (peek() == '=') {
 			next();
-			return SUBASSN;
+			return MINUS_EQUAL;
 		} else if (peek() == '>') {
 			next();
 			return THIN_ARROW;
 		} else {
-			return SUB;
+			return MINUS;
 		}
 	}
 	if (c == '.') {
 		if (peek() == '.') {
 			next();
-			return DDOT;
+			return DOT_DOT;
 		} else {
 			return DOT;
 		}
@@ -140,73 +145,73 @@ TokenType Lexer::parse_operator() {
 	if (c == '/') {
 		if (peek() == '=') {
 			next();
-			return DIVASSN;
+			return SLASH_EQUAL;
 		} else {
-			return DIV;
+			return SLASH;
 		}
 	}
 	if (c == ':') {
-		return COL;
+		return COLON;
 	}
 	if (c == ';') {
-		return SCOL;
+		return SEMICOLON;
 	}
 	if (c == '<') {
 		if (peek() == '=') {
 			next();
-			return LE;
+			return LESS;
 		} else {
-			return LT;
+			return LESS_EQUAL;
 		}
 	}
 	if (c == '=') {
 		if (peek() == '=') {
 			next();
-			return EQ;
+			return EQUAL_EQUAL;
 		} else if (peek() == '>') {
 			next();
 			return FAT_ARROW;
 		} else {
-			return ASSN;
+			return EQUAL;
 		}
 	}
 	if (c == '>') {
 		if (peek() == '=') {
 			next();
-			return GE;
+			return GREATER;
 		} else {
-			return GT;
+			return GREATER_EQUAL;
 		}
 	}
 
 	if (c == '?') {
 		if (peek() == '?') {
 			next();
-			return DQM;
+			return QUESTIONMARK_QUESTIONMARK;
 		} else {
-			return QM;
+			return QUESTIONMARK;
 		}
 	}
 
 	if (c == '[') {
-		return LBRACK;
+		return LEFT_BRACKET;
 	}
 	if (c == ']') {
-		return RBRACK;
+		return RIGHT_BRACKET;
 	}
 	if (c == '{') {
-		return LBRACE;
+		return LEFT_BRACE;
 	}
 	if (c == '|') {
 		if (peek() == '|') {
 			next();
-			return OR;
+			return PIPE_PIPE;
 		} else {
 			return PIPE;
 		}
 	}
 	if (c == '}') {
-		return RBRACE;
+		return RIGHT_BRACE;
 	}
 
 	return INVALID;
@@ -215,16 +220,18 @@ TokenType Lexer::parse_operator() {
 Token Lang::Lexer::parse_keyword() {
 	buffer.erase();
 
-	while (isalnum(peek()) || peek() == '#' || peek() == '$' || peek() == '_') {
+	while (is_identifier()) {
 		buffer.push_back(next());
 	}
 
-	auto type = find_by_value(buffer.c_str());
+	TokenType type;
+	try {
+		type = types.at(buffer);
+	} catch (std::out_of_range&) {
+		type = TokenType::IDENTIFIER;
+	}
 
-	return {type == TokenType::INVALID
-			? TokenType::IDENTIFIER
-			: type,
-			buffer, row, col - (int) buffer.size(), col};
+	return {type, buffer, row, col - (int) buffer.size(), col};
 
 }
 
@@ -233,7 +240,12 @@ inline bool Lang::Lexer::is_startof_identifier() {
 	return isalpha(c) || c == '$' || c == '_';
 }
 
-void Lang::Lexer::emit_token(const Token &token) {
+inline bool Lang::Lexer::is_identifier() {
+	char c = peek();
+	return isalnum(c) || c == '#' || c == '$' || c == '_';
+}
+
+void Lang::Lexer::emit_token(const Token& token) {
 	// std::cout << token << std::endl;
 	if (token.type == TokenType::INVALID) {
 		throw Lexer_Token_Error("Unexpected token", token);
@@ -277,19 +289,19 @@ Token Lang::Lexer::parse_string() {
 		next(); // skip string termination
 	}
 
-	return {TokenType::LIT_STR,
+	return {TokenType::STRING,
 			buffer, row, col - (int) buffer.size(), col};
 }
 
 void Lexer::lex() {
 	try {
 		do_lex();
-	} catch (Lexer_Location_Error &ex) {
+	} catch (Lexer_Location_Error& ex) {
 		print_location(text, ex.get_row(), ex.get_start_col(),
 					   ex.get_end_col());
 		std::cerr << RED << ex.what() << std::endl << RESET;
 		throw ex;
-	} catch (Lexer_Token_Error &ex) {
+	} catch (Lexer_Token_Error& ex) {
 		print_location(text, ex.get_token().row, ex.get_token().start_char,
 					   ex.get_token().end_char);
 		std::cerr << RED << ex.what() << std::endl << RESET;
@@ -326,8 +338,8 @@ Token Lexer::parse_number() {
 	}
 
 	TokenType type = comma_found
-					 ? TokenType::LIT_FLT
-					 : TokenType::LIT_INT;
+					 ? TokenType::FLOAT
+					 : TokenType::INTEGER;
 
 	return {type, buffer, row, start_col, col};
 }
@@ -389,7 +401,7 @@ Token Lexer::parse_char() {
 		next(); // skip '
 	}
 
-	return {TokenType::LIT_CHR, buffer, row, col - 1, col};
+	return {TokenType::CHAR, buffer, row, col - 1, col};
 }
 
 std::vector<Token> const& Lexer::get_tokens() const {
@@ -409,7 +421,7 @@ void Lexer::parse_block_comment() {
 	int start_row = 0;
 	int depth = 0;
 
-	while(true) {
+	while (true) {
 		if (!has_next()) {
 			throw Lexer_Location_Error("Unterminated block comment", start_row,
 									   start_col, start_col + 2);

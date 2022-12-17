@@ -16,7 +16,7 @@ int main(int argc, char** argv) {
 
 	lexer.lex();
 
-	auto parser = Lang::Parser(lexer.get_tokens());
+	auto parser = Lang::Parser(str, lexer.get_tokens());
 
 	parser.parse();
 

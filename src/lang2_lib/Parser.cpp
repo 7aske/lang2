@@ -65,7 +65,7 @@ Ast::Node Parser::create_node(Token token) {
 		case TokenType::BREAK:
 		case TokenType::TRUE:
 		case TokenType::FALSE:
-		case TokenType::NULL:
+		case TokenType::NIL:
 		case TokenType::IMPORT:
 		case TokenType::INCL:
 		case TokenType::AS:
@@ -73,53 +73,52 @@ Ast::Node Parser::create_node(Token token) {
 		case TokenType::RETURN:
 		case TokenType::FAT_ARROW:
 		case TokenType::THIN_ARROW:
-		case TokenType::ASSN:
-		case TokenType::DQM:
-		case TokenType::QM:
-		case TokenType::COL:
-		case TokenType::ADD:
-		case TokenType::SUB:
-		case TokenType::DIV:
+		case TokenType::EQUAL:
+		case TokenType::QUESTIONMARK_QUESTIONMARK:
+		case TokenType::QUESTIONMARK:
+		case TokenType::COLON:
+		case TokenType::PLUS:
+		case TokenType::MINUS:
+		case TokenType::SLASH:
 		case TokenType::STAR:
-		case TokenType::STARSTAR:
-		case TokenType::MOD:
-		case TokenType::AMP:
-		case TokenType::AND:
+		case TokenType::STAR_STAR:
+		case TokenType::PERCENT:
+		case TokenType::AMPERSAND:
+		case TokenType::AMPERSAND_AMPERSAND:
 		case TokenType::CARET:
 		case TokenType::PIPE:
-		case TokenType::OR:
-		case TokenType::NOT:
-		case TokenType::EQ:
-		case TokenType::NE:
-		case TokenType::GT:
-		case TokenType::LT:
-		case TokenType::GE:
-		case TokenType::LE:
-		case TokenType::LSHIFT:
-		case TokenType::RSHIFT:
+		case TokenType::PIPE_PIPE:
+		case TokenType::BANG:
+		case TokenType::EQUAL_EQUAL:
+		case TokenType::BANG_EQUAL:
+		case TokenType::GREATER_EQUAL:
+		case TokenType::LESS_EQUAL:
+		case TokenType::GREATER:
+		case TokenType::LESS:
+		case TokenType::LESS_LESS:
+		case TokenType::GREATER_GREATER:
 		case TokenType::TILDE:
-		case TokenType::INC:
-		case TokenType::DEC:
-		case TokenType::SUBASSN:
-		case TokenType::ADDASSN:
-		case TokenType::MULASSN:
-		case TokenType::DIVASSN:
+		case TokenType::PLUS_PLUS:
+		case TokenType::MINUS_MINUS:
+		case TokenType::MINUS_EQUAL:
+		case TokenType::PLUS_EQUAL:
+		case TokenType::STAR_EQUAL:
+		case TokenType::SLASH_EQUAL:
 		case TokenType::DOT:
-		case TokenType::DDOT:
+		case TokenType::DOT_DOT:
 		case TokenType::COMMA:
-		case TokenType::SCOL:
-		case TokenType::LPAREN:
-		case TokenType::RPAREN:
-		case TokenType::LBRACE:
-		case TokenType::RBRACE:
-		case TokenType::LBRACK:
-		case TokenType::RBRACK:
+		case TokenType::SEMICOLON:
+		case TokenType::LEFT_PARENTHESIS:
+		case TokenType::RIGHT_PARENTHESIS:
+		case TokenType::LEFT_BRACE:
+		case TokenType::RIGHT_BRACE:
+		case TokenType::LEFT_BRACKET:
+		case TokenType::RIGHT_BRACKET:
 		case TokenType::IDENTIFIER:
-		case TokenType::LIT_STR:
-		case TokenType::LIT_CHR:
-		case TokenType::LIT_INT:
-		case TokenType::LIT_FLT:
-		case TokenType::LIT_BOOL:
+		case TokenType::STRING:
+		case TokenType::CHAR:
+		case TokenType::INTEGER:
+		case TokenType::FLOAT:
 			throw Parser_Token_Error("Unexpected token", token);
 	}
 }

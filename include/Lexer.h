@@ -70,6 +70,8 @@ private:
 	Token parse_char();
 
 	void parse_block_comment();
+
+	bool is_identifier();
 };
 
 class Lexer_Error : public std::exception {

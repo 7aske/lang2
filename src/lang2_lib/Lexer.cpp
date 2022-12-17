@@ -7,12 +7,8 @@
 namespace Lang {
 
 Lexer::Lexer(std::string const& text) : Indexed_Char_Iterator(text) {
-	auto *buf_ptr = new std::string();
-	buf_ptr->reserve(max_identifier_length);
-
+	this->buffer.reserve(max_identifier_length);
 	this->tokens.reserve(2048);
-
-	this->buffer = std::shared_ptr<std::string>(buf_ptr);
 }
 
 void Lang::Lexer::do_lex() {
@@ -20,6 +16,8 @@ void Lang::Lexer::do_lex() {
 	while (has_next()) {
 		if (isspace(peek())) {
 			next();
+		} else if (is_startof_block_comment()) {
+			parse_block_comment();
 		} else if (is_startof_line_comment()) {
 			while (has_next() && peek() != '\n') {
 				next();
@@ -61,6 +59,7 @@ void Lang::Lexer::do_lex() {
 inline bool Lang::Lexer::is_startof_line_comment() {
 	return peek() == '/' && offset(1) == '/';
 }
+
 
 TokenType Lexer::parse_operator() {
 	using enum Lang::TokenType;
@@ -214,18 +213,18 @@ TokenType Lexer::parse_operator() {
 }
 
 Token Lang::Lexer::parse_keyword() {
-	buffer->erase();
+	buffer.erase();
 
 	while (isalnum(peek()) || peek() == '#' || peek() == '$' || peek() == '_') {
-		buffer->push_back(next());
+		buffer.push_back(next());
 	}
 
-	auto type = find_by_value(buffer->c_str());
+	auto type = find_by_value(buffer.c_str());
 
 	return {type == TokenType::INVALID
 			? TokenType::IDENTIFIER
 			: type,
-			*buffer, row, col - (int) buffer->size(), col};
+			buffer, row, col - (int) buffer.size(), col};
 
 }
 
@@ -251,7 +250,7 @@ inline bool Lang::Lexer::is_startof_string() {
 }
 
 Token Lang::Lexer::parse_string() {
-	buffer->erase();
+	buffer.erase();
 
 	int start_row = row;
 	int start_col = col;
@@ -268,7 +267,7 @@ Token Lang::Lexer::parse_string() {
 			c = resolve_escape_sequence(next());
 		}
 
-		buffer->push_back(c);
+		buffer.push_back(c);
 	}
 
 	if (!is_startof_string()) {
@@ -279,7 +278,7 @@ Token Lang::Lexer::parse_string() {
 	}
 
 	return {TokenType::LIT_STR,
-			*buffer, row, col - (int) buffer->size(), col};
+			buffer, row, col - (int) buffer.size(), col};
 }
 
 void Lexer::lex() {
@@ -289,15 +288,17 @@ void Lexer::lex() {
 		print_location(text, ex.get_row(), ex.get_start_col(),
 					   ex.get_end_col());
 		std::cerr << RED << ex.what() << std::endl << RESET;
+		throw ex;
 	} catch (Lexer_Token_Error &ex) {
 		print_location(text, ex.get_token().row, ex.get_token().start_char,
 					   ex.get_token().end_char);
 		std::cerr << RED << ex.what() << std::endl << RESET;
+		throw ex;
 	}
 }
 
 Token Lexer::parse_number() {
-	buffer->clear();
+	buffer.clear();
 	int start_row = row;
 	int start_col = col;
 
@@ -321,14 +322,14 @@ Token Lexer::parse_number() {
 			next(); // skip _
 		}
 
-		buffer->push_back(next());
+		buffer.push_back(next());
 	}
 
 	TokenType type = comma_found
 					 ? TokenType::LIT_FLT
 					 : TokenType::LIT_INT;
 
-	return {type, *buffer, row, start_col, col};
+	return {type, buffer, row, start_col, col};
 }
 
 char Lang::Lexer::resolve_escape_sequence(char c) const {
@@ -366,7 +367,7 @@ inline bool Lexer::is_startof_char() {
 }
 
 Token Lexer::parse_char() {
-	buffer->clear();
+	buffer.clear();
 
 	int start_char = col;
 	next(); // skip quote;
@@ -379,7 +380,7 @@ Token Lexer::parse_char() {
 		c = next();
 	}
 
-	buffer->push_back(c);
+	buffer.push_back(c);
 
 	if (peek() != '\'') {
 		throw Lexer_Location_Error("Invalid char literal", row, start_char,
@@ -388,11 +389,48 @@ Token Lexer::parse_char() {
 		next(); // skip '
 	}
 
-	return {TokenType::LIT_CHR, *buffer, row, col - 1, col};
+	return {TokenType::LIT_CHR, buffer, row, col - 1, col};
 }
 
 std::vector<Token> const& Lexer::get_tokens() const {
 	return tokens;
+}
+
+bool Lexer::is_startof_block_comment() {
+	return peek() == '/' && offset(1) == '*';
+}
+
+inline bool Lang::Lexer::is_endof_block_comment() {
+	return peek() == '*' && offset(1) == '/';
+}
+
+void Lexer::parse_block_comment() {
+	int start_col = 0;
+	int start_row = 0;
+	int depth = 0;
+
+	while(true) {
+		if (!has_next()) {
+			throw Lexer_Location_Error("Unterminated block comment", start_row,
+									   start_col, start_col + 2);
+		}
+
+		if (is_startof_block_comment()) {
+			start_col = col;
+			start_row = row;
+			depth++;
+			skip(2); // skip start block comment
+		} else if (is_endof_block_comment()) {
+			depth--;
+			skip(2);
+		} else {
+			next();
+		}
+
+		if (depth == 0) {
+			break;
+		}
+	}
 }
 
 }

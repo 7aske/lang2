@@ -16,6 +16,7 @@ class Iterator {
 public:
 	virtual T next() = 0;
 	virtual T peek() = 0;
+	virtual void skip(int) = 0;
 	virtual T offset(int) = 0;
 	virtual bool has_next() = 0;
 
@@ -34,6 +35,11 @@ public:
 		if (!has_next())
 			throw std::range_error("Index out of range");
 		return *(iter++);
+	}
+
+	inline void skip(int num) override {
+		for (int i = 0; i < num; ++i)
+			next();
 	}
 
 	inline char peek() override {

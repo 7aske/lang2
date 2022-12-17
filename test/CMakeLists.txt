@@ -4,7 +4,9 @@ add_subdirectory(lib)
 
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 
-add_executable(Google_Tests_run lang2_lib/ParserTest.cpp)
+add_executable(Google_Tests_run
+        lang2_lib/LexerTest.cpp
+        lang2_lib/ParserTest.cpp)
 
 target_link_libraries(Google_Tests_run lang2_lib)
 

@@ -31,6 +31,10 @@ public:
 		return *(iter++);
 	}
 
+	inline void skip(int i) override {
+		iter += i;
+	}
+
 	inline Token peek() override {
 		return *iter;
 	}

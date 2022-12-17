@@ -37,7 +37,7 @@ private:
 
 	void do_lex();
 
-	std::shared_ptr<std::string> buffer;
+	std::string buffer;
 
 	std::vector<Token> tokens;
 
@@ -48,6 +48,10 @@ private:
 	Token parse_keyword();
 
 	bool is_startof_identifier();
+
+	bool is_startof_block_comment();
+
+	bool is_endof_block_comment();
 
 	void emit_token(const Token& token);
 
@@ -64,6 +68,8 @@ private:
 	bool is_startof_char();
 
 	Token parse_char();
+
+	void parse_block_comment();
 };
 
 class Lexer_Error : public std::exception {

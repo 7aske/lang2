@@ -21,9 +21,9 @@ public:
 
 	void parse();
 
-	Ast::Node parse_expression();
+	Ast::Expression parse_expression();
 
-	[[nodiscard]] std::vector<Ast::Node> get_nodes() const;
+	[[nodiscard]] std::vector<Ast::Expression> get_nodes() const;
 
 	Token next() override {
 		if (!has_next())
@@ -52,11 +52,11 @@ private:
 	iterator iter;
 	iterator end;
 	std::vector<Token> tokens;
-	std::vector<Ast::Node> nodes;
+	std::vector<Ast::Expression> nodes;
 
-	Ast::Node parse_statement();
+	Ast::Expression parse_statement();
 
-	Ast::Node create_node(Token token);
+	Ast::Expression create_node(Token token);
 };
 
 

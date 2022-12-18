@@ -70,4 +70,18 @@ print_location(const std::string& text, int row, int start_char, int end_char) {
 	print_underline(start_char, end_char);
 }
 
+template<class T>
+std::string
+parenthesize(std::string const& name, std::initializer_list<T> list) {
+	std::stringstream buffer;
+
+	buffer << "( " << name;
+	for (auto& elem: list) {
+		buffer << " " << elem;
+	}
+	buffer << " )" << std::endl;
+
+	return buffer.str();
+}
+
 }

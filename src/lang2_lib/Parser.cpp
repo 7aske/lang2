@@ -19,7 +19,7 @@ Parser::Parser(std::string const& text, const std::vector<Token>& tokens)
 	this->nodes.reserve(1024);
 }
 
-std::vector<Ast::Node> Parser::get_nodes() const {
+std::vector<Ast::Expression> Parser::get_nodes() const {
 	return nodes;
 }
 
@@ -29,11 +29,13 @@ void Parser::parse() {
 		try {
 			nodes.push_back(parse_statement());
 		} catch (Parser_Location_Error& ex) {
+			std::cerr << MAGENTA << "Error occurred during parsing:" << std::endl << RESET;
 			print_location(text, ex.get_row(), ex.get_start_col(),
 						   ex.get_end_col());
 			std::cerr << RED << ex.what() << std::endl << RESET;
 			return;
 		} catch (Parser_Token_Error& ex) {
+			std::cerr << MAGENTA << "Error occurred during parsing:" << std::endl << RESET;
 			print_location(text, ex.get_token().row, ex.get_token().start_char,
 						   ex.get_token().end_char);
 			std::cerr << RED << ex.what() << std::endl << RESET;
@@ -43,16 +45,16 @@ void Parser::parse() {
 
 }
 
-Ast::Node Parser::parse_expression() {
-	Ast::Node node = create_node(next());
+Ast::Expression Parser::parse_expression() {
+	Ast::Expression node = create_node(next());
 	return node;
 }
 
-Ast::Node Parser::parse_statement() {
+Ast::Expression Parser::parse_statement() {
 	return parse_expression();
 }
 
-Ast::Node Parser::create_node(Token token) {
+Ast::Expression Parser::create_node(Token token) {
 	switch (token.type) {
 		case TokenType::INVALID:
 		case TokenType::WHILE:

@@ -14,27 +14,32 @@
 #include <algorithm>
 #include <iomanip>
 
-#define RESET   "\033[0m"
-#define BLACK   "\033[30m"      /* Black */
-#define RED     "\033[31m"      /* Red */
-#define GREEN   "\033[32m"      /* Green */
-#define YELLOW  "\033[33m"      /* Yellow */
-#define BLUE    "\033[34m"      /* Blue */
-#define MAGENTA "\033[35m"      /* Magenta */
-#define CYAN    "\033[36m"      /* Cyan */
-#define WHITE   "\033[37m"      /* White */
-#define BOLDBLACK   "\033[1m\033[30m"      /* Bold Black */
-#define BOLDRED     "\033[1m\033[31m"      /* Bold Red */
-#define BOLDGREEN   "\033[1m\033[32m"      /* Bold Green */
-#define BOLDYELLOW  "\033[1m\033[33m"      /* Bold Yellow */
-#define BOLDBLUE    "\033[1m\033[34m"      /* Bold Blue */
-#define BOLDMAGENTA "\033[1m\033[35m"      /* Bold Magenta */
-#define BOLDCYAN    "\033[1m\033[36m"      /* Bold Cyan */
-#define BOLDWHITE   "\033[1m\033[37m"      /* Bold White */
+static constexpr char const* RESET = "\033[0m";
+static constexpr char const* BLACK = "\033[30m";  /* Black */
+static constexpr char const* RED = "\033[31m";    /* Red */
+static constexpr char const* GREEN = "\033[32m";  /* Green */
+static constexpr char const* YELLOW = "\033[33m"; /* Yellow */
+static constexpr char const* BLUE = "\033[34m";   /* Blue */
+static constexpr char const* MAGENTA = "\033[35m";/* Magenta */
+static constexpr char const* CYAN = "\033[36m";   /* Cyan */
+static constexpr char const* WHITE = "\033[37m";  /* White */
+static constexpr char const* BOLDBLACK = "\033[1m\033[30m";  /* Bold Black */
+static constexpr char const* BOLDRED = "\033[1m\033[31m";    /* Bold Red */
+static constexpr char const* BOLDGREEN = "\033[1m\033[32m";  /* Bold Green */
+static constexpr char const* BOLDYELLOW = "\033[1m\033[33m"; /* Bold Yellow */
+static constexpr char const* BOLDBLUE = "\033[1m\033[34m";   /* Bold Blue */
+static constexpr char const* BOLDMAGENTA = "\033[1m\033[35m";/* Bold Magenta */
+static constexpr char const* BOLDCYAN = "\033[1m\033[36m";   /* Bold Cyan */
+static constexpr char const* BOLDWHITE = "\033[1m\033[37m";  /* Bold White */
 
 namespace Lang {
 
-void print_location(const std::string& text, int row, int start_char, int end_char);
+void
+print_location(const std::string& text, int row, int start_char, int end_char);
+
+template<class T>
+std::string
+parenthesize(std::string const& name, std::initializer_list<T> list);
 
 }
 

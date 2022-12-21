@@ -159,9 +159,9 @@ TokenType Lexer::parse_operator() {
 	if (c == '<') {
 		if (peek() == '=') {
 			next();
-			return LESS;
-		} else {
 			return LESS_EQUAL;
+		} else {
+			return LESS;
 		}
 	}
 	if (c == '=') {
@@ -178,9 +178,9 @@ TokenType Lexer::parse_operator() {
 	if (c == '>') {
 		if (peek() == '=') {
 			next();
-			return GREATER;
-		} else {
 			return GREATER_EQUAL;
+		} else {
+			return GREATER;
 		}
 	}
 

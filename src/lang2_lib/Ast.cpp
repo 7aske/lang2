@@ -5,15 +5,15 @@
 #include "Ast.h"
 
 
-const Lang::TokenType& Lang::Ast::Binary_Expression::get_operator() const {
+Lang::TokenType& Lang::Ast::Binary_Expression::get_operator() {
 	return this->token.type;
 }
 
-const Lang::Ast::Expression& Lang::Ast::Binary_Expression::get_left() const {
+Lang::Ast::Expression& Lang::Ast::Binary_Expression::get_left() {
 	return this->left;
 }
 
-const Lang::Ast::Expression& Lang::Ast::Binary_Expression::get_right() const {
+Lang::Ast::Expression& Lang::Ast::Binary_Expression::get_right() {
 	return this->right;
 }
 
@@ -23,4 +23,17 @@ void Lang::Ast::Binary_Expression::accept(Visitor& v) {
 
 const Lang::Token& Lang::Ast::Expression::get_token() const {
 	return this->token;
+}
+
+Lang::Ast::Expression&
+Lang::Ast::Unary_Expression::get_expression() {
+	return this->expression;
+}
+
+const Lang::TokenType& Lang::Ast::Unary_Expression::get_operator() {
+	return this->token.type;
+}
+
+void Lang::Ast::Unary_Expression::accept(Lang::Visitor& v) {
+	v.visit_unary_expression(this);
 }

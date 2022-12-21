@@ -96,7 +96,7 @@ struct Token {
 	~Token() = default;
 
 	// TODO: should include a filename
-	const TokenType type;
+	TokenType type;
 	std::string value;
 	int row = 0;
 	int start_char = 0;

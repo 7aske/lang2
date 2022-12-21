@@ -6,6 +6,8 @@
 #define LANG2_PARSER_H
 
 #include <vector>
+#include <memory>
+#include <algorithm>
 
 #include "Token.h"
 #include "Iterator.h"
@@ -17,13 +19,12 @@ class Parser : public Iterator<Token> {
 	using iterator = std::vector<Token>::const_iterator;
 public:
 	Parser(std::string const& text, std::vector<Token> const& tokens);
+
 	virtual ~Parser() = default;
 
 	void parse();
 
-	Ast::Expression parse_expression();
-
-	[[nodiscard]] std::vector<Ast::Expression> get_nodes() const;
+	[[nodiscard]] std::vector<std::shared_ptr<Ast::Expression>> get_nodes() const;
 
 	Token next() override {
 		if (!has_next())
@@ -39,6 +40,11 @@ public:
 		return *iter;
 	}
 
+	inline bool is_peek_of_type(std::initializer_list<TokenType> const& token_types) {
+		if (!has_next()) return false;
+		return std::find(token_types.begin(), token_types.end(), peek().type) != token_types.end();
+	}
+
 	inline Token offset(int offset) override {
 		return *(iter + offset);
 	}
@@ -52,9 +58,24 @@ private:
 	iterator iter;
 	iterator end;
 	std::vector<Token> tokens;
-	std::vector<Ast::Expression> nodes;
 
-	Ast::Expression parse_statement();
+	std::vector<std::shared_ptr<Ast::Expression>> nodes;
+
+	std::unique_ptr<Ast::Expression> parse_statement();
+
+	std::unique_ptr<Ast::Expression> parse_expression();
+
+	std::unique_ptr<Ast::Expression> parse_comparison();
+
+	std::unique_ptr<Ast::Expression> parse_term();
+
+	std::unique_ptr<Ast::Expression> parse_factor();
+
+	std::unique_ptr<Ast::Expression> parse_unary();
+
+	std::unique_ptr<Ast::Expression> parse_primary();
+
+	std::unique_ptr<Ast::Expression> parse_equality();
 
 	Ast::Expression create_node(Token token);
 };

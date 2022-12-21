@@ -37,9 +37,12 @@ namespace Lang {
 void
 print_location(const std::string& text, int row, int start_char, int end_char);
 
-template<class T>
-std::string
-parenthesize(std::string const& name, std::initializer_list<T> list);
+std::string parenthesize(std::string const& name, std::string const& left);
+
+std::string parenthesize(std::string const& name, std::string const& left, std::string const& right);
+
+bool string_to_bool(std::string const& ip);
+
 
 }
 

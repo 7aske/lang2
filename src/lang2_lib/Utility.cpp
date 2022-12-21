@@ -70,18 +70,27 @@ print_location(const std::string& text, int row, int start_char, int end_char) {
 	print_underline(start_char, end_char);
 }
 
-template<class T>
-std::string
-parenthesize(std::string const& name, std::initializer_list<T> list) {
+std::string parenthesize(std::string const& name, std::string const& left, std::string const& right) {
 	std::stringstream buffer;
 
 	buffer << "( " << name;
-	for (auto& elem: list) {
+	for (auto& elem: {left, right}) {
 		buffer << " " << elem;
 	}
 	buffer << " )" << std::endl;
 
 	return buffer.str();
 }
+
+std::string parenthesize(std::string const& name, std::string const& left) {
+	return parenthesize(name, left, "");
+}
+
+
+bool string_to_bool(std::string const& ip) {
+	bool op;
+	std::istringstream(ip) >> std::boolalpha >> op;
+	return op;
+	}
 
 }

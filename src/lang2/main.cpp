@@ -20,5 +20,14 @@ int main(int argc, char** argv) {
 
 	parser.parse();
 
+	Lang::Ast_Printer printer;
+
+	auto nodes = parser.get_nodes();
+	std::for_each(nodes.begin(), nodes.end(), [&printer](auto& node) {
+		if (node) {
+			node->accept(printer);
+		}
+	});
+
 	return 0;
 }

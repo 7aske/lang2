@@ -7,7 +7,7 @@
 
 namespace Lang {
 
-Token::Token(const TokenType type, std::string value, const int row,
+Token::Token(const TokenType type, std::string  value, const int row,
 			 const int start_char, const int end_char)
 		: type(type), value(std::move(value)), row(row), start_char(start_char),
 		  end_char(end_char) {}

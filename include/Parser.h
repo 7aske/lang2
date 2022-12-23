@@ -24,7 +24,8 @@ public:
 
 	void parse();
 
-	[[nodiscard]] std::vector<std::shared_ptr<Ast::Expression>> get_nodes() const;
+	[[nodiscard]] std::vector<std::shared_ptr<Ast::Expression>>
+	get_nodes() const;
 
 	Token next() override {
 		if (!has_next())
@@ -40,9 +41,11 @@ public:
 		return *iter;
 	}
 
-	inline bool is_peek_of_type(std::initializer_list<TokenType> const& token_types) {
+	inline bool
+	is_peek_of_type(std::initializer_list<TokenType> const& token_types) {
 		if (!has_next()) return false;
-		return std::find(token_types.begin(), token_types.end(), peek().type) != token_types.end();
+		return std::find(token_types.begin(), token_types.end(), peek().type) !=
+			   token_types.end();
 	}
 
 	inline Token offset(int offset) override {
@@ -61,23 +64,21 @@ private:
 
 	std::vector<std::shared_ptr<Ast::Expression>> nodes;
 
-	std::unique_ptr<Ast::Expression> parse_statement();
+	std::shared_ptr<Ast::Expression> parse_statement();
 
-	std::unique_ptr<Ast::Expression> parse_expression();
+	std::shared_ptr<Ast::Expression> parse_expression();
 
-	std::unique_ptr<Ast::Expression> parse_comparison();
+	std::shared_ptr<Ast::Expression> parse_comparison();
 
-	std::unique_ptr<Ast::Expression> parse_term();
+	std::shared_ptr<Ast::Expression> parse_term();
 
-	std::unique_ptr<Ast::Expression> parse_factor();
+	std::shared_ptr<Ast::Expression> parse_factor();
 
-	std::unique_ptr<Ast::Expression> parse_unary();
+	std::shared_ptr<Ast::Expression> parse_unary();
 
-	std::unique_ptr<Ast::Expression> parse_primary();
+	std::shared_ptr<Ast::Expression> parse_primary();
 
-	std::unique_ptr<Ast::Expression> parse_equality();
-
-	Ast::Expression create_node(Token token);
+	std::shared_ptr<Ast::Expression> parse_equality();
 };
 
 

@@ -21,7 +21,7 @@ namespace Lang {
 /**
  * Maximum length of an identifier.
  */
-static const int max_identifier_length = 256;
+static constexpr int max_identifier_length = 256;
 
 class Lexer : public Indexed_Char_Iterator {
 public:
@@ -34,12 +34,11 @@ public:
 	[[nodiscard]] std::vector<Token> const& get_tokens() const;
 
 private:
-
-	void do_lex();
-
 	std::string buffer;
 
 	std::vector<Token> tokens;
+
+	void do_lex();
 
 	bool is_startof_line_comment();
 

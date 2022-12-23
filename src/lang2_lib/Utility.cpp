@@ -77,7 +77,7 @@ std::string parenthesize(std::string const& name, std::string const& left, std::
 	for (auto& elem: {left, right}) {
 		buffer << " " << elem;
 	}
-	buffer << " )" << std::endl;
+	buffer << " )";
 
 	return buffer.str();
 }

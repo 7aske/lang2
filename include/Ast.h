@@ -5,6 +5,9 @@
 #ifndef LANG2_AST_H
 #define LANG2_AST_H
 
+#include <utility>
+#include <memory>
+
 #include "Token.h"
 #include "Visitor.h"
 
@@ -17,12 +20,13 @@ public:
 
 	virtual ~Expression() = default;
 
-	virtual void accept(Lang::Visitor& v) { /* stub */ };
+	virtual void accept(Lang::Visitor& v) = 0;
 
 protected:
 	explicit Expression(const Token& token)
 			: token(token) {}
 
+	// TODO: maybe should be a ptr
 	Token token;
 
 };
@@ -30,35 +34,35 @@ protected:
 class Binary_Expression : public Expression {
 
 public:
-	Binary_Expression(Expression const& left, const Token& token,
-					  Expression const& right)
+	Binary_Expression(std::shared_ptr<Expression> left, const Token& token,
+					  std::shared_ptr<Expression> right)
 			: Expression(token)
-			  , left(left)
-			  , right(right) {}
+			  , left(std::move(left))
+			  , right(std::move(right)) {}
 
-	[[nodiscard]] Expression& get_left();
+	std::shared_ptr<Expression> get_left();
 
-	[[nodiscard]] Expression& get_right();
+	std::shared_ptr<Expression> get_right();
 
-	[[nodiscard]] TokenType& get_operator();
+	TokenType& get_operator();
 
 	void accept(Visitor& v) override;
 
 	~Binary_Expression() override = default;
 
 protected:
-	Expression left;
-	Expression right;
+	std::shared_ptr<Expression> left;
+	std::shared_ptr<Expression> right;
 };
 
 class Unary_Expression : public Expression {
 
 public:
-	Unary_Expression(Token const& token, Expression const& expression)
+	Unary_Expression(Token const& token, std::shared_ptr<Expression> expression)
 			: Expression(token)
-			  , expression(expression) {}
+			  , expression(std::move(expression)) {}
 
-	[[nodiscard]] Expression& get_expression();
+	std::shared_ptr<Expression> get_expression();
 
 	[[nodiscard]] TokenType const& get_operator();
 
@@ -67,11 +71,11 @@ public:
 	~Unary_Expression() override = default;
 
 protected:
-	Expression expression;
+	std::shared_ptr<Expression> expression;
 
 };
 
-template<class T>
+template<typename T>
 class Literal_Expression : public Expression {
 public:
 	Literal_Expression(Token const& token, T value)
@@ -79,7 +83,7 @@ public:
 			  , value(std::move(value)) {}
 
 	explicit Literal_Expression(Token const& token)
-		: Expression(token) {}
+			: Expression(token) {}
 
 	~Literal_Expression() override = default;
 
@@ -87,17 +91,68 @@ protected:
 	T value;
 };
 
+class Boolean_Literal : public Literal_Expression<bool> {
+public:
+	explicit Boolean_Literal(Token const& token, bool value)
+			: Literal_Expression(token, value) {}
+
+	void accept(Visitor& v) override;
+};
+
+class Integer_Literal : public Literal_Expression<int> {
+public:
+	explicit Integer_Literal(Token const& token, int value)
+			: Literal_Expression(token, value) {}
+
+	void accept(Visitor& v) override;
+};
+
+class Float_Literal : public Literal_Expression<double> {
+public:
+	explicit Float_Literal(Token const& token, double value)
+			: Literal_Expression(token, value) {}
+
+	void accept(Visitor& v) override;
+};
+
+class Nil_Literal : public Literal_Expression<void*> {
+public:
+	explicit Nil_Literal(Token const& token)
+			: Literal_Expression(token) {}
+
+	void accept(Visitor& v) override;
+};
+
+class String_Literal : public Literal_Expression<std::string> {
+public:
+	String_Literal(Token const& token, std::string value)
+			: Literal_Expression(token, std::move(value)) {}
+
+	void accept(Visitor& v) override;
+};
+
+class Char_Literal : public Literal_Expression<char> {
+public:
+	explicit Char_Literal(Token const& token, char value)
+			: Literal_Expression(token, value) {}
+
+	void accept(Visitor& v) override;
+};
+
 class Grouping_Expression : public Expression {
 public:
-	Grouping_Expression(Token const& token, Expression const& expression)
+	Grouping_Expression(Token const& token,
+						std::shared_ptr<Expression> expression)
 			: Expression(token)
-			  , expression(expression) {}
+			  , expression(std::move(expression)) {}
 
 
 	~Grouping_Expression() override = default;
 
+	void accept(Visitor& v) override;
+
 protected:
-	Expression expression;
+	std::shared_ptr<Expression> expression;
 };
 
 class Equality : public Binary_Expression {
@@ -144,14 +199,16 @@ public:
 
 class Primary : public Expression {
 public:
-	explicit Primary(const Token& token, Expression const& expression)
+	explicit Primary(const Token& token, std::shared_ptr<Expression> expression)
 			: Expression(token)
-			  , expression(expression) {}
+			  , expression(std::move(expression)) {}
 
 	~Primary() override = default;
 
+	void accept(Visitor& v) override;
+
 protected:
-	Expression expression;
+	std::shared_ptr<Expression> expression;
 };
 
 }

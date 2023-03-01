@@ -25,7 +25,7 @@ TEST (ParserTest, Test) {
 	Lang::Parser parser(text, lexer.get_tokens());
 	parser.parse();
 
-	std::vector<Lang::Ast::Node> nodes = parser.get_nodes();
+	std::vector<std::shared_ptr<Lang::Ast::Expression>> nodes = parser.get_nodes();
 
 	ASSERT_EQ(1, nodes.size());
 }

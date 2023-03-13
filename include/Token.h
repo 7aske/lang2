@@ -78,6 +78,8 @@ enum class TokenType {
 	RIGHT_BRACE,               // }
 	LEFT_BRACKET,              // [
 	RIGHT_BRACKET,             // ]
+	LET,                       // let
+	CONST,                     // const
 	IDENTIFIER,
 	STRING,
 	CHAR,
@@ -101,6 +103,7 @@ struct Token {
 	int row = 0;
 	int start_char = 0;
 	int end_char = 0;
+
 };
 
 static const std::unordered_map<std::string, TokenType> types = {
@@ -166,6 +169,8 @@ static const std::unordered_map<std::string, TokenType> types = {
 		{"}",        TokenType::RIGHT_BRACE,},
 		{"[",        TokenType::LEFT_BRACKET,},
 		{"]",        TokenType::RIGHT_BRACKET,},
+		{"let",      TokenType::LET,},
+		{"const",    TokenType::CONST,},
 };
 
 static const std::string& find_by_value(TokenType val) {

@@ -9,206 +9,101 @@
 #include <memory>
 
 #include "Token.h"
-#include "Visitor.h"
 
 
 namespace Lang::Ast {
 
-class Expression {
-public:
-	[[nodiscard]] Token const& get_token() const;
 
-	virtual ~Expression() = default;
+struct Node {
 
-	virtual void accept(Lang::Visitor& v) = 0;
+	enum class Type {
+		IDENTIFIER,
 
-protected:
-	explicit Expression(const Token& token)
-			: token(token) {}
+		// Literals
+		NIL_LITERAL,
+		BOOL_LITERAL,
+		CHAR_LITERAL,
+		STRING_LITERAL,
+		INTEGER_LITERAL,
+		FLOAT_LITERAL,
 
-	// TODO: maybe should be a ptr
-	Token token;
+		// ternary
+		TERNARY,
 
-};
+		// binary
+		BINARY,
 
-class Binary_Expression : public Expression {
+		// unary
+		UNARY,
+		NOT,
+		MINUS,
+		PRE_INCREMENT,
+		POST_INCREMENT,
+		PRE_DECREMENT,
+		POST_DECREMENT,
 
-public:
-	Binary_Expression(std::shared_ptr<Expression> left, const Token& token,
-					  std::shared_ptr<Expression> right)
-			: Expression(token)
-			  , left(std::move(left))
-			  , right(std::move(right)) {}
+		FOR,
+		BREAK,
+		CONTINUE,
+		IN,
+		ITER,
+		WHILE,
+		IF,
 
-	std::shared_ptr<Expression> get_left();
+		BLOCK,
+		GROUPING,
 
-	std::shared_ptr<Expression> get_right();
+		// @Todo type, function declarations
+	};
 
-	TokenType& get_operator();
+	Node(const std::shared_ptr<Token> token);
 
-	void accept(Visitor& v) override;
+	Node(std::shared_ptr<Node> left,
+		 std::shared_ptr<Node> middle,
+		 std::shared_ptr<Node> right,
+		 const std::vector<std::shared_ptr<Node>>& nodes,
+		 Type type,
+		 const std::shared_ptr<Token> token);
 
-	~Binary_Expression() override = default;
+	Node(std::shared_ptr<Node> left,
+		 std::shared_ptr<Node> right,
+		 Lang::Ast::Node::Type type,
+		 const std::shared_ptr<Token> token);
 
-protected:
-	std::shared_ptr<Expression> left;
-	std::shared_ptr<Expression> right;
-};
+	Node(std::shared_ptr<Node> left,
+		 Lang::Ast::Node::Type type,
+		 const std::shared_ptr<Token> token);
 
-class Unary_Expression : public Expression {
+	Node(std::string& value,
+		 const std::shared_ptr<Token> token);
 
-public:
-	Unary_Expression(Token const& token, std::shared_ptr<Expression> expression)
-			: Expression(token)
-			  , expression(std::move(expression)) {}
+	Node(long value,
+		 const std::shared_ptr<Token> token);
 
-	std::shared_ptr<Expression> get_expression();
+	Node(bool value,
+		 const std::shared_ptr<Token> token);
 
-	[[nodiscard]] TokenType const& get_operator();
+	Node(double value,
+		 const std::shared_ptr<Token> token);
 
-	void accept(Visitor& v) override;
+	Node(char value,
+		 const std::shared_ptr<Token> token);
 
-	~Unary_Expression() override = default;
+	std::shared_ptr<Node> left = nullptr;
+	std::shared_ptr<Node> middle = nullptr;
+	std::shared_ptr<Node> right = nullptr;
+	std::vector<std::shared_ptr<Node>> nodes;
+	Node::Type type;
+	std::shared_ptr<Token> token;
 
-protected:
-	std::shared_ptr<Expression> expression;
+	union {
+		bool boolean_value;
+		long integer_value;
+		double float_value;
+		char char_value;
+	} basic_value;
 
-};
-
-template<typename T>
-class Literal_Expression : public Expression {
-public:
-	Literal_Expression(Token const& token, T value)
-			: Expression(token)
-			  , value(std::move(value)) {}
-
-	explicit Literal_Expression(Token const& token)
-			: Expression(token) {}
-
-	~Literal_Expression() override = default;
-
-protected:
-	T value;
-};
-
-class Boolean_Literal : public Literal_Expression<bool> {
-public:
-	explicit Boolean_Literal(Token const& token, bool value)
-			: Literal_Expression(token, value) {}
-
-	void accept(Visitor& v) override;
-};
-
-class Integer_Literal : public Literal_Expression<int> {
-public:
-	explicit Integer_Literal(Token const& token, int value)
-			: Literal_Expression(token, value) {}
-
-	void accept(Visitor& v) override;
-};
-
-class Float_Literal : public Literal_Expression<double> {
-public:
-	explicit Float_Literal(Token const& token, double value)
-			: Literal_Expression(token, value) {}
-
-	void accept(Visitor& v) override;
-};
-
-class Nil_Literal : public Literal_Expression<void*> {
-public:
-	explicit Nil_Literal(Token const& token)
-			: Literal_Expression(token) {}
-
-	void accept(Visitor& v) override;
-};
-
-class String_Literal : public Literal_Expression<std::string> {
-public:
-	String_Literal(Token const& token, std::string value)
-			: Literal_Expression(token, std::move(value)) {}
-
-	void accept(Visitor& v) override;
-};
-
-class Char_Literal : public Literal_Expression<char> {
-public:
-	explicit Char_Literal(Token const& token, char value)
-			: Literal_Expression(token, value) {}
-
-	void accept(Visitor& v) override;
-};
-
-class Grouping_Expression : public Expression {
-public:
-	Grouping_Expression(Token const& token,
-						std::shared_ptr<Expression> expression)
-			: Expression(token)
-			  , expression(std::move(expression)) {}
-
-
-	~Grouping_Expression() override = default;
-
-	void accept(Visitor& v) override;
-
-protected:
-	std::shared_ptr<Expression> expression;
-};
-
-class Equality : public Binary_Expression {
-public:
-	using Binary_Expression::Binary_Expression;
-
-	~Equality() override = default;
-};
-
-class Comparison : public Binary_Expression {
-public:
-	using Binary_Expression::Binary_Expression;
-
-	~Comparison() override = default;
-};
-
-class Term : public Binary_Expression {
-public:
-	using Binary_Expression::Binary_Expression;
-
-	~Term() override = default;
-};
-
-class Factor : public Binary_Expression {
-public:
-	using Binary_Expression::Binary_Expression;
-
-	~Factor() override = default;
-};
-
-class Negation : public Unary_Expression {
-public:
-	using Unary_Expression::Unary_Expression;
-
-	~Negation() override = default;
-};
-
-class Minus : public Unary_Expression {
-public:
-	using Unary_Expression::Unary_Expression;
-
-	~Minus() override = default;
-};
-
-class Primary : public Expression {
-public:
-	explicit Primary(const Token& token, std::shared_ptr<Expression> expression)
-			: Expression(token)
-			  , expression(std::move(expression)) {}
-
-	~Primary() override = default;
-
-	void accept(Visitor& v) override;
-
-protected:
-	std::shared_ptr<Expression> expression;
+	std::string string_value;
 };
 
 }

@@ -49,3 +49,22 @@ TEST (LexerTest, TestNestedBlockComment) {
 
 	ASSERT_EQ(0, lexer.get_tokens().size());
 }
+
+TEST (LexerTest, TestLet) {
+	std::vector<Lang::Token> tokens;
+	std::string text = "let a:i32 = \"test\";";
+
+	Lang::Lexer lexer(text);
+	lexer.lex();
+
+	// @formatter:off
+	ASSERT_EQ(7, lexer.get_tokens().size());
+	ASSERT_EQ(Lang::TokenType::LET,        lexer.get_tokens()[0].type);
+	ASSERT_EQ(Lang::TokenType::IDENTIFIER, lexer.get_tokens()[1].type);
+	ASSERT_EQ(Lang::TokenType::COLON,      lexer.get_tokens()[2].type);
+	ASSERT_EQ(Lang::TokenType::IDENTIFIER, lexer.get_tokens()[3].type);
+	ASSERT_EQ(Lang::TokenType::EQUAL,      lexer.get_tokens()[4].type);
+	ASSERT_EQ(Lang::TokenType::STRING,     lexer.get_tokens()[5].type);
+	ASSERT_EQ(Lang::TokenType::SEMICOLON,  lexer.get_tokens()[6].type);
+	// @formatter:on
+}

@@ -38,8 +38,11 @@ public:
 	}
 
 	inline void skip(int num) override {
-		for (int i = 0; i < num; ++i)
-			next();
+		for (int i = 0; i < num; ++i) {
+			if (!has_next())
+				throw std::range_error("Index out of range");
+			++iter;
+		}
 	}
 
 	inline char peek() override {

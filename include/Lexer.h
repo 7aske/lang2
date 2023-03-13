@@ -31,7 +31,7 @@ public:
 
 	void lex();
 
-	[[nodiscard]] std::vector<Token> const& get_tokens() const;
+	[[nodiscard]] std::vector<Token> get_tokens() const;
 
 private:
 	std::string buffer;

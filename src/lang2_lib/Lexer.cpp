@@ -406,7 +406,7 @@ Token Lexer::parse_char() {
 	return {TokenType::CHAR, buffer, row, col - 1, col};
 }
 
-std::vector<Token> const& Lexer::get_tokens() const {
+std::vector<Token> Lexer::get_tokens() const {
 	return tokens;
 }
 

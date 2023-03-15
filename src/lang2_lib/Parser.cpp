@@ -38,13 +38,14 @@ void Parser::parse() {
 			return;
 		} catch (Parser_Token_Error& ex) {
 			std::cerr << MAGENTA << "Error occurred during parsing:" << std::endl << RESET;
-			print_location(text, ex.get_token().row, ex.get_token().start_char,
-						   ex.get_token().end_char);
+			print_location(text, ex.get_row(), ex.get_start_col(),
+						   ex.get_end_col());
 			std::cerr << RED << ex.what() << std::endl << RESET;
 			return;
 		}
 	}
 
+	// @Todo verify EOF token
 }
 
 std::shared_ptr<Ast::Node> Parser::parse_expression() {
@@ -53,6 +54,7 @@ std::shared_ptr<Ast::Node> Parser::parse_expression() {
 }
 
 std::shared_ptr<Ast::Node> Parser::parse_statement() {
+
 	return parse_expression();
 }
 
@@ -64,7 +66,7 @@ std::shared_ptr<Ast::Node> Parser::parse_term() {
 	while(is_peek_of_type({MINUS, PLUS})) {
 		auto op = next();
 		auto right = parse_factor();
-		expression = std::make_shared<Ast::Node>(expression, right, Ast::Node::Type::BINARY, op);
+		expression = std::make_shared<Ast::Node>(Ast::Node::binary(expression, right, op));
 	}
 
 	return expression;
@@ -78,7 +80,7 @@ std::shared_ptr<Ast::Node> Parser::parse_factor() {
 	while(is_peek_of_type({SLASH, STAR})) {
 		auto op = next();
 		auto right = parse_unary();
-		expression = std::make_shared<Ast::Node>(expression, right, Ast::Node::Type::BINARY, op);
+		expression = std::make_shared<Ast::Node>(Ast::Node::binary(expression, right, op));
 	}
 
 	return expression;
@@ -87,16 +89,10 @@ std::shared_ptr<Ast::Node> Parser::parse_factor() {
 std::shared_ptr<Ast::Node> Parser::parse_unary() {
 	using enum Lang::TokenType;
 
-	if (is_peek_of_type({MINUS})) {
+	if (is_peek_of_type({MINUS, BANG})) {
 		auto op = next();
-		auto right = parse_primary();
-		return std::make_shared<Ast::Node>(right, Ast::Node::Type::MINUS, op);
-	}
-
-	if (is_peek_of_type({BANG})) {
-		auto op = next();
-		auto right = parse_primary();
-		return std::make_shared<Ast::Node>(right, Ast::Node::Type::NOT, op);
+		auto expression = parse_primary();
+		return std::make_shared<Ast::Node>(Ast::Node::unary(expression, op));
 	}
 
 	return parse_primary();
@@ -107,22 +103,22 @@ std::shared_ptr<Ast::Node> Parser::parse_primary() {
 
 	auto token = next();
 	if (token->type == FALSE || token->type == TRUE)
-		return std::make_shared<Ast::Node>(string_to_bool(token->value), token);
+		return std::make_shared<Ast::Node>(Ast::Node::bool_literal(token));
 
 	if (token->type == NIL)
-		return std::make_shared<Ast::Node>(token);
+		return std::make_shared<Ast::Node>(Ast::Node::nil_literal(token));
 
 	if (token->type == INTEGER)
-		return std::make_shared<Ast::Node>(std::stol(token->value), token);
+		return std::make_shared<Ast::Node>(Ast::Node::integer_literal(token));
 
 	if (token->type == FLOAT)
-		return std::make_shared<Ast::Node>(std::stod(token->value), token);
+		return std::make_shared<Ast::Node>(Ast::Node::float_literal(token));
 
 	if (token->type == STRING)
-		return std::make_shared<Ast::Node>(token->value, token);
+		return std::make_shared<Ast::Node>(Ast::Node::string_literal(token));
 
 	if (token->type == CHAR)
-		return std::make_shared<Ast::Node>(token->value[0], token);
+		return std::make_shared<Ast::Node>(Ast::Node::char_literal(token));
 
 	if (token->type == LEFT_PARENTHESIS) {
 		std::shared_ptr<Ast::Node> expression = parse_expression();
@@ -130,7 +126,11 @@ std::shared_ptr<Ast::Node> Parser::parse_primary() {
 			throw Parser_Token_Error("Unclosed parenthesis", peek());
 		}
 
-		return std::make_shared<Ast::Node>(expression, Ast::Node::Type::GROUPING, token);
+		return std::make_shared<Ast::Node>(Ast::Node::grouping_statement(expression, token));
+	}
+
+	if (token->type == IDENTIFIER) {
+		return std::make_shared<Ast::Node>(Ast::Node::identifier(token));
 	}
 
 	throw Parser_Token_Error("Unexpected token", token);
@@ -144,7 +144,7 @@ std::shared_ptr<Ast::Node> Parser::parse_comparison() {
 	while(is_peek_of_type({GREATER_EQUAL, LESS_EQUAL, GREATER, LESS})) {
 		auto op = next();
 		auto right = parse_term();
-		expression = std::make_shared<Ast::Node>(expression, right, Ast::Node::Type::BINARY, op);
+		expression = std::make_shared<Ast::Node>(Ast::Node::binary(expression, right, op));
 	}
 
 	return expression;
@@ -160,14 +160,8 @@ std::shared_ptr<Ast::Node> Parser::parse_equality() {
 		auto op = next();
 		// Was parse comparison
 		auto right = parse_comparison();
-		expression = std::make_shared<Ast::Node>(expression, right, Ast::Node::Type::BINARY, op);
+		expression = std::make_shared<Ast::Node>(Ast::Node::binary(expression, right, op));
 	}
-
-	return expression;
-}
-
-std::shared_ptr<Ast::Node> Parser::parse_ternary_expression() {
-	auto expression = parse_expression();
 
 	return expression;
 }

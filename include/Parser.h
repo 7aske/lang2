@@ -79,8 +79,6 @@ private:
 	std::shared_ptr<Ast::Node> parse_primary();
 
 	std::shared_ptr<Ast::Node> parse_equality();
-
-	std::shared_ptr<Ast::Node> parse_ternary_expression();
 };
 
 
@@ -94,19 +92,26 @@ public:
 		return msg;
 	}
 
+	virtual int get_row() const = 0;
+
+	virtual int get_start_col() const = 0;
+
+	virtual int get_end_col() const = 0;
+
 protected:
 	const char* msg;
 };
 
 class Parser_Token_Error : public Parser_Error {
 public:
-	Parser_Token_Error(const char* msg, const Token& token)
-			: Parser_Error(msg), token(token) {}
-
 	Parser_Token_Error(const char* msg, std::shared_ptr<Token> token)
 			: Parser_Error(msg), token(*token) {}
 
-	[[nodiscard]] const Token& get_token() const { return token; }
+	[[nodiscard]] int get_row() const override { return token.row; }
+
+	[[nodiscard]] int get_start_col() const override { return token.start_char; }
+
+	[[nodiscard]] int get_end_col() const override { return token.end_char; }
 
 protected:
 	const Token token;
@@ -120,11 +125,11 @@ public:
 			  , start_col(start_col)
 			  , end_col(end_col) {}
 
-	[[nodiscard]] int get_row() const { return row; }
+	[[nodiscard]] int get_row() const override { return row; }
 
-	[[nodiscard]] int get_start_col() const { return start_col; }
+	[[nodiscard]] int get_start_col() const override { return start_col; }
 
-	[[nodiscard]] int get_end_col() const { return end_col; }
+	[[nodiscard]] int get_end_col() const override { return end_col; }
 
 protected:
 	const int row;

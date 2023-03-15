@@ -50,12 +50,14 @@ void Parser::parse() {
 
 std::shared_ptr<Ast::Node> Parser::parse_expression() {
 	return parse_equality();
-//	throw Parser_Token_Error("Unsupported operation", peek());
 }
 
 std::shared_ptr<Ast::Node> Parser::parse_statement() {
+	if (is_peek_of_type({TokenType::PRINT})) {
+		return parse_print_statement();
+	}
 
-	return parse_expression();
+	return parse_expression_statement();
 }
 
 std::shared_ptr<Ast::Node> Parser::parse_term() {
@@ -122,10 +124,7 @@ std::shared_ptr<Ast::Node> Parser::parse_primary() {
 
 	if (token->type == LEFT_PARENTHESIS) {
 		std::shared_ptr<Ast::Node> expression = parse_expression();
-		if (!is_peek_of_type({RIGHT_PARENTHESIS})) {
-			throw Parser_Token_Error("Unclosed parenthesis", peek());
-		}
-
+		expect(Lang::TokenType::RIGHT_PARENTHESIS);
 		return std::make_shared<Ast::Node>(Ast::Node::grouping_statement(expression, token));
 	}
 
@@ -163,6 +162,27 @@ std::shared_ptr<Ast::Node> Parser::parse_equality() {
 		expression = std::make_shared<Ast::Node>(Ast::Node::binary(expression, right, op));
 	}
 
+	return expression;
+}
+
+void Parser::expect(TokenType type) {
+	if (!this->is_peek_of_type({type})) {
+		throw Parser_Token_Error(std::string("Expected token of type ") + find_by_value(type), peek());
+	}
+	next();
+}
+
+std::shared_ptr<Ast::Node> Parser::parse_print_statement() {
+	auto token = next();
+	auto expression = parse_expression();
+	expect(TokenType::SEMICOLON);
+	auto retval = std::make_shared<Ast::Node>(Ast::Node::print_statement(expression, token));
+	return retval;
+}
+
+std::shared_ptr<Ast::Node> Parser::parse_expression_statement() {
+	auto expression = parse_expression();
+	expect(TokenType::SEMICOLON);
 	return expression;
 }
 

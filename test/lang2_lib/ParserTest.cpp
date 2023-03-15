@@ -20,7 +20,7 @@ class ParserTest : public ::testing::Test {
 };
 
 TEST (ParserTest, ParseEquality) {
-	std::string code = "1 == 1";
+	std::string code = "1 == 1;";
 
 	auto nodes = parse(code);
 
@@ -30,7 +30,15 @@ TEST (ParserTest, ParseEquality) {
 }
 
 TEST (ParserTest, ParseAssignment) {
-	std::string code = "a = 1";
+	std::string code = "a = 1;";
+
+	auto nodes = parse(code);
+
+	ASSERT_EQ(1, nodes.size());
+}
+
+TEST (ParserTest, ParsePrint) {
+	std::string code = "print true == true;";
 
 	auto nodes = parse(code);
 

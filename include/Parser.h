@@ -64,6 +64,8 @@ private:
 
 	std::vector<std::shared_ptr<Ast::Node>> nodes;
 
+	void expect(TokenType type);
+
 	std::shared_ptr<Ast::Node> parse_statement();
 
 	std::shared_ptr<Ast::Node> parse_expression();
@@ -79,17 +81,21 @@ private:
 	std::shared_ptr<Ast::Node> parse_primary();
 
 	std::shared_ptr<Ast::Node> parse_equality();
+
+	std::shared_ptr<Ast::Node> parse_print_statement();
+
+	std::shared_ptr<Ast::Node> parse_expression_statement();
 };
 
 
 class Parser_Error : public std::exception {
 public:
-	explicit Parser_Error(const char* msg)
+	explicit Parser_Error(const std::string& msg)
 			: msg(msg) {}
 
 	[[nodiscard]] const char*
 	what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW override {
-		return msg;
+		return msg.c_str();
 	}
 
 	virtual int get_row() const = 0;
@@ -98,13 +104,16 @@ public:
 
 	virtual int get_end_col() const = 0;
 
-protected:
-	const char* msg;
+private:
+	std::string msg;
 };
 
 class Parser_Token_Error : public Parser_Error {
 public:
 	Parser_Token_Error(const char* msg, std::shared_ptr<Token> token)
+			: Parser_Error(msg), token(*token) {}
+
+	Parser_Token_Error(const std::string& msg, std::shared_ptr<Token> token)
 			: Parser_Error(msg), token(*token) {}
 
 	[[nodiscard]] int get_row() const override { return token.row; }

@@ -137,7 +137,7 @@ Lang::Ast::Node Lang::Ast::Node::bool_literal(std::shared_ptr<Token> token) {
 								   nullptr,
 								   nullptr,
 								   {},
-								   Node::Type::NIL_LITERAL,
+								   Node::Type::BOOL_LITERAL,
 								   token);
 	node.basic_value.boolean_value = string_to_bool(token->value);
 	return node;
@@ -148,7 +148,7 @@ Lang::Ast::Node Lang::Ast::Node::char_literal(std::shared_ptr<Token> token) {
 								nullptr,
 								nullptr,
 								{},
-								Node::Type::NIL_LITERAL,
+								Node::Type::CHAR_LITERAL,
 								token);
 	node.basic_value.char_value = token->value[0];
 	return node;
@@ -159,7 +159,7 @@ Lang::Ast::Node Lang::Ast::Node::string_literal(std::shared_ptr<Token> token) {
 								nullptr,
 								nullptr,
 								{},
-								Node::Type::NIL_LITERAL,
+								Node::Type::STRING_LITERAL,
 								token);
 	node.string_value = token->value;
 	return node;
@@ -170,7 +170,7 @@ Lang::Ast::Node Lang::Ast::Node::integer_literal(std::shared_ptr<Token> token) {
 								nullptr,
 								nullptr,
 								{},
-								Node::Type::NIL_LITERAL,
+								Node::Type::INTEGER_LITERAL,
 								token);
 	node.basic_value.integer_value = std::stoll(token->value);
 	return node;
@@ -181,8 +181,19 @@ Lang::Ast::Node Lang::Ast::Node::float_literal(std::shared_ptr<Token> token) {
 								nullptr,
 								nullptr,
 								{},
-								Node::Type::NIL_LITERAL,
+								Node::Type::FLOAT_LITERAL,
 								token);
 	node.basic_value.float_value = std::stod(token->value);
+	return node;
+}
+
+Lang::Ast::Node Lang::Ast::Node::print_statement(std::shared_ptr<Node> expression,
+								 std::shared_ptr<Token> token) {
+	auto node = Lang::Ast::Node(expression,
+								nullptr,
+								nullptr,
+								{},
+								Node::Type::PRINT,
+								token);
 	return node;
 }

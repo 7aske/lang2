@@ -73,6 +73,7 @@ struct Node {
 		BLOCK,
 		GROUPING,
 
+		PRINT,
 		// @Todo type, function declarations
 	};
 
@@ -101,6 +102,8 @@ struct Node {
 
 	static Lang::Ast::Node grouping_statement(std::shared_ptr<Node> expression,
 											  std::shared_ptr<Token> token);
+	static Lang::Ast::Node print_statement(std::shared_ptr<Node> expression,
+										   std::shared_ptr<Token> token);
 
 
 	Node(std::shared_ptr<Lang::Ast::Node> left,
@@ -139,7 +142,7 @@ private:
 		bool boolean_value;
 	} basic_value;
 
-	std::string string_value;
+	std::string string_value{};
 };
 
 }

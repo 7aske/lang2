@@ -85,6 +85,7 @@ enum class TokenType {
 	CHAR,
 	INTEGER,
 	FLOAT,
+	PRINT, // @Temporary
 	__TOK_SIZE,
 };
 
@@ -107,6 +108,7 @@ struct Token {
 };
 
 static const std::unordered_map<std::string, TokenType> types = {
+		{"print",    TokenType::PRINT,}, // @Temporary
 		{"class",    TokenType::CLASS,},
 		{"super",    TokenType::SUPER,},
 		{"this",     TokenType::THIS,},

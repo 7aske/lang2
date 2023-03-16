@@ -12,6 +12,7 @@
 #include "Token.h"
 #include "Iterator.h"
 #include "Ast.h"
+#include "Lexer.h"
 
 namespace Lang {
 
@@ -19,6 +20,8 @@ class Parser : public Iterator<std::shared_ptr<Token>> {
 	using iterator = std::vector<Token>::const_iterator;
 public:
 	explicit Parser(std::string const& text, std::vector<Token> const& tokens);
+
+	Parser(std::string const& text);
 
 	virtual ~Parser() = default;
 
@@ -57,6 +60,8 @@ public:
 	}
 
 private:
+	std::unique_ptr<Lang::Lexer> lexer;
+	bool lexed = false;
 	std::string const& text;
 	iterator iter;
 	iterator end;

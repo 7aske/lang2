@@ -6,7 +6,7 @@ include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 
 add_executable(Google_Tests_run
         lang2_lib/LexerTest.cpp
-        lang2_lib/ParserTest.cpp)
+        lang2_lib/ParserTest.cpp ../include/Interpreter.h ../src/lang2_lib/Interpreter.cpp lang2_lib/InterpreterTest.cpp)
 
 target_link_libraries(Google_Tests_run lang2_lib)
 

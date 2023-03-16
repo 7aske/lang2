@@ -13,7 +13,7 @@ add_library(lang2_lib
         include/Utility.h
         src/lang2_lib/Utility.cpp
         include/Parser.h
-        src/lang2_lib/Parser.cpp include/Ast.h src/lang2_lib/Ast.cpp)
+        src/lang2_lib/Parser.cpp include/Ast.h src/lang2_lib/Ast.cpp include/Interpreter.h src/lang2_lib/Interpreter.cpp)
 
 add_executable(lang2 src/lang2/main.cpp)
 target_link_libraries(lang2 lang2_lib)

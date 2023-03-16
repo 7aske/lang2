@@ -3,6 +3,7 @@
 //
 
 #include <vector>
+#include <any>
 #include "Ast.h"
 #include "Utility.h"
 
@@ -196,4 +197,115 @@ Lang::Ast::Node Lang::Ast::Node::print_statement(std::shared_ptr<Node> expressio
 								Node::Type::PRINT,
 								token);
 	return node;
+}
+
+std::any Lang::Ast::Node::interpret(Interpreter* interpreter) {
+	switch (this->type) {
+		case Type::INVALID:
+			break;
+		case Type::IDENTIFIER:
+			break;
+		case Type::NIL_LITERAL:
+			break;
+		case Type::BOOL_LITERAL:
+			break;
+		case Type::CHAR_LITERAL:
+			break;
+		case Type::STRING_LITERAL:
+			break;
+		case Type::INTEGER_LITERAL:
+			break;
+		case Type::FLOAT_LITERAL:
+			break;
+		case Type::TERNARY:
+			break;
+		case Type::ADDITION:
+			break;
+		case Type::SUBTRACTION:
+			break;
+		case Type::MULTIPLICATION:
+			break;
+		case Type::DIVISION:
+			break;
+		case Type::MODULO:
+			break;
+		case Type::POWER:
+			break;
+		case Type::EQUAL:
+			break;
+		case Type::NOT_EQUAL:
+			break;
+		case Type::GREATER_THAN:
+			break;
+		case Type::LESS_THAN:
+			break;
+		case Type::GREATER_THAN_EQUAL:
+			break;
+		case Type::LESS_THAN_EQUAL:
+			break;
+		case Type::NOT:
+			break;
+		case Type::MINUS:
+			break;
+		case Type::PRE_INCREMENT:
+			break;
+		case Type::POST_INCREMENT:
+			break;
+		case Type::PRE_DECREMENT:
+			break;
+		case Type::POST_DECREMENT:
+			break;
+		case Type::FUNCTION:
+			break;
+		case Type::IF:
+			break;
+		case Type::FOR:
+			break;
+		case Type::WHILE:
+			break;
+		case Type::DECLARATION:
+			break;
+		case Type::RETURN:
+			break;
+		case Type::BREAK:
+			break;
+		case Type::CONTINUE:
+			break;
+		case Type::BLOCK:
+			break;
+		case Type::GROUPING:
+			break;
+		case Type::PRINT:
+			std::cout << this->left->to_string() << std::endl;
+			break;
+	}
+
+	return std::any();
+}
+
+std::string Lang::Ast::Node::to_string() const {
+	using enum Lang::Ast::Node::Type;
+
+	std::stringstream os;
+
+	if (type == FLOAT_LITERAL) {
+		os << basic_value.float_value;
+	}
+	if (type == CHAR_LITERAL) {
+		os << basic_value.char_value;
+	}
+
+	if (type == INTEGER_LITERAL) {
+		os << basic_value.integer_value;
+	}
+
+	if (type == BOOL_LITERAL) {
+		os << basic_value.boolean_value;
+	}
+
+	if (type == STRING_LITERAL) {
+		os << string_value;
+	}
+
+	return os.str();
 }

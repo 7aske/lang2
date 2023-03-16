@@ -17,6 +17,7 @@ Parser::Parser(const std::string& text, std::vector<Token> const& tokens)
 	this->iter = this->tokens.begin();
 	this->end = this->tokens.end();
 	this->nodes.reserve(1024);
+	this->lexed = true;
 }
 
 std::vector<std::shared_ptr<Ast::Node>> Parser::get_nodes() const {
@@ -24,6 +25,10 @@ std::vector<std::shared_ptr<Ast::Node>> Parser::get_nodes() const {
 }
 
 void Parser::parse() {
+	if (!lexed) {
+		lexer->lex();
+		tokens = lexer->get_tokens();
+	}
 
 	while (has_next()) {
 		try {
@@ -184,6 +189,10 @@ std::shared_ptr<Ast::Node> Parser::parse_expression_statement() {
 	auto expression = parse_expression();
 	expect(TokenType::SEMICOLON);
 	return expression;
+}
+
+Parser::Parser(const std::string& text): text(text) {
+	this->lexer = std::make_unique<Lexer>(text);
 }
 
 }

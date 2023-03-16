@@ -10,12 +10,13 @@
 #include <memory>
 
 #include "Token.h"
+#include "Interpreter.h"
 
 
 namespace Lang::Ast {
 
 
-struct Node {
+struct Node : public Interpretable {
 
 	enum class Type {
 		INVALID = -1,
@@ -125,6 +126,10 @@ struct Node {
 	long boolean_value() const { return basic_value.boolean_value; }
 	const std::string& get_string_value() const { return string_value; }
 	const std::string& name() const { return string_value; }
+
+	std::string to_string() const;
+
+	std::any interpret(Interpreter* interpreter) override;
 
 private:
 

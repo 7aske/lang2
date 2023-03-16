@@ -21,14 +21,13 @@ class Parser : public Iterator<std::shared_ptr<Token>> {
 public:
 	explicit Parser(std::string const& text, std::vector<Token> const& tokens);
 
-	Parser(std::string const& text);
+	explicit Parser(std::string const& text);
 
 	virtual ~Parser() = default;
 
 	void parse();
 
-	[[nodiscard]] std::vector<std::shared_ptr<Ast::Node>>
-	get_nodes() const;
+	std::vector<std::shared_ptr<Ast::Node>> get_nodes() const;
 
 	std::shared_ptr<Token> next() override {
 		if (!has_next())
@@ -47,8 +46,7 @@ public:
 	inline bool
 	is_peek_of_type(std::initializer_list<TokenType> const& token_types) {
 		if (!has_next()) return false;
-		return std::find(token_types.begin(), token_types.end(), peek()->type) !=
-			   token_types.end();
+		return std::ranges::find(token_types, peek()->type) != token_types.end();
 	}
 
 	inline std::shared_ptr<Token> offset(int offset) override {
@@ -90,6 +88,10 @@ private:
 	std::shared_ptr<Ast::Node> parse_print_statement();
 
 	std::shared_ptr<Ast::Node> parse_expression_statement();
+
+	std::shared_ptr<Ast::Node> parse_declaration();
+
+	std::shared_ptr<Ast::Node> parse_variable_declaration();
 };
 
 
@@ -98,8 +100,7 @@ public:
 	explicit Parser_Error(const std::string& msg)
 			: msg(msg) {}
 
-	[[nodiscard]] const char*
-	what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW override {
+	const char* what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW override {
 		return msg.c_str();
 	}
 
@@ -121,11 +122,11 @@ public:
 	Parser_Token_Error(const std::string& msg, std::shared_ptr<Token> token)
 			: Parser_Error(msg), token(*token) {}
 
-	[[nodiscard]] int get_row() const override { return token.row; }
+	int get_row() const override { return token.row; }
 
-	[[nodiscard]] int get_start_col() const override { return token.start_char; }
+	int get_start_col() const override { return token.start_char; }
 
-	[[nodiscard]] int get_end_col() const override { return token.end_char; }
+	int get_end_col() const override { return token.end_char; }
 
 protected:
 	const Token token;
@@ -139,11 +140,11 @@ public:
 			  , start_col(start_col)
 			  , end_col(end_col) {}
 
-	[[nodiscard]] int get_row() const override { return row; }
+	int get_row() const override { return row; }
 
-	[[nodiscard]] int get_start_col() const override { return start_col; }
+	int get_start_col() const override { return start_col; }
 
-	[[nodiscard]] int get_end_col() const override { return end_col; }
+	int get_end_col() const override { return end_col; }
 
 protected:
 	const int row;

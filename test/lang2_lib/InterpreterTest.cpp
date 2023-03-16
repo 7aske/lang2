@@ -20,7 +20,9 @@ protected:
 };
 
 TEST (InterpreterTest, TestPrint) {
-	std::string text = "print \"Hello World\"; print \"\n123\";";
+	std::string text = "print \"Hello World\";"
+					   "print \"\n\";"
+					   "print \"123\";";
 
 	Lang::Parser parser(text);
 	parser.parse();

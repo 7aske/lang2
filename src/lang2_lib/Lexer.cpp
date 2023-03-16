@@ -298,13 +298,15 @@ void Lexer::lex() {
 		do_lex();
 	} catch (Lexer_Location_Error& ex) {
 		std::cerr << RED << "Error occurred during lexing:" << std::endl << RESET;
-		print_location(text, ex.get_row(), ex.get_start_col(),
+		print_location(text, ex.get_row(),
+					   ex.get_start_col(),
 					   ex.get_end_col());
 		std::cerr << RED << ex.what() << std::endl << RESET;
 		throw ex;
 	} catch (Lexer_Token_Error& ex) {
 		std::cerr << RED << "Error occurred during lexing:" << std::endl << RESET;
-		print_location(text, ex.get_token().row, ex.get_token().start_char,
+		print_location(text, ex.get_token().row,
+					   ex.get_token().start_char,
 					   ex.get_token().end_char);
 		std::cerr << RED << ex.what() << std::endl << RESET;
 		throw ex;

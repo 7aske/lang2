@@ -30,7 +30,15 @@ TEST (ParserTest, ParseEquality) {
 }
 
 TEST (ParserTest, ParseAssignment) {
-	std::string code = "a = 1;";
+	std::string code = "let a = 1;";
+
+	auto nodes = parse(code);
+
+	ASSERT_EQ(1, nodes.size());
+}
+
+TEST (ParserTest, ParseAssignmentConst) {
+	std::string code = "const a = 1;";
 
 	auto nodes = parse(code);
 

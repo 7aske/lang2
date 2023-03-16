@@ -31,7 +31,7 @@ public:
 
 	void lex();
 
-	[[nodiscard]] std::vector<Token> get_tokens() const;
+	std::vector<Token> get_tokens() const;
 
 private:
 	std::string buffer;
@@ -62,7 +62,7 @@ private:
 
 	Token parse_number();
 
-	[[nodiscard]] char resolve_escape_sequence(char) const;
+	char resolve_escape_sequence(char) const;
 
 	bool is_startof_char();
 
@@ -78,10 +78,15 @@ public:
 	explicit Lexer_Error(const char* msg)
 			: msg(msg) {}
 
-	[[nodiscard]] const char*
-	what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW override {
+	const char* what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW override {
 		return msg;
 	}
+
+	virtual int get_row() const = 0;
+
+	virtual int get_start_col() const = 0;
+
+	virtual int get_end_col() const = 0;
 
 protected:
 	const char* msg;
@@ -92,7 +97,13 @@ public:
 	Lexer_Token_Error(const char* msg, const Token& token)
 			: Lexer_Error(msg), token(token) {}
 
-	[[nodiscard]] const Token& get_token() const { return token; }
+	const Token& get_token() const { return token; }
+
+	int get_row() const override { return token.row; }
+
+	int get_start_col() const override { return token.start_char; }
+
+	int get_end_col() const override { return token.end_char; }
 
 protected:
 	const Token token;
@@ -106,11 +117,11 @@ public:
 			  , start_col(start_col)
 			  , end_col(end_col) {}
 
-	[[nodiscard]] int get_row() const { return row; }
+	int get_row() const override { return row; }
 
-	[[nodiscard]] int get_start_col() const { return start_col; }
+	int get_start_col() const override { return start_col; }
 
-	[[nodiscard]] int get_end_col() const { return end_col; }
+	int get_end_col() const override { return end_col; }
 
 protected:
 	const int row;

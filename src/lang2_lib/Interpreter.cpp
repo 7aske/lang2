@@ -10,7 +10,8 @@ void Lang::Interpreter::run() {
 			interp->interpret(this);
 		} catch (Interpreter_Error& ex) {
 			std::cerr << MAGENTA << "Runtime error:" << std::endl << RESET;
-			print_location(text, ex.get_row(), ex.get_start_col(),
+			print_location(text, ex.get_row(),
+						   ex.get_start_col(),
 						   ex.get_end_col());
 			std::cerr << RED << ex.what() << std::endl << RESET;
 			return;

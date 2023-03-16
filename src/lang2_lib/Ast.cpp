@@ -75,7 +75,7 @@ Lang::Ast::Node Lang::Ast::Node::binary(std::shared_ptr<Lang::Ast::Node> left,
 			type = Type::NOT_EQUAL;
 			break;
 
-		// @Todo binary number operations
+			// @Todo binary number operations
 
 	}
 
@@ -124,22 +124,22 @@ Lang::Ast::Node::grouping_statement(std::shared_ptr<Node> expression,
 
 Lang::Ast::Node Lang::Ast::Node::nil_literal(std::shared_ptr<Token> token) {
 	auto node = Lang::Ast::Node(nullptr,
-						   nullptr,
-						   nullptr,
-						   {},
-						   Node::Type::NIL_LITERAL,
-						   token);
+								nullptr,
+								nullptr,
+								{},
+								Node::Type::NIL_LITERAL,
+								token);
 	node.basic_value = {};
 	return node;
 }
 
 Lang::Ast::Node Lang::Ast::Node::bool_literal(std::shared_ptr<Token> token) {
 	auto node = Lang::Ast::Node(nullptr,
-								   nullptr,
-								   nullptr,
-								   {},
-								   Node::Type::BOOL_LITERAL,
-								   token);
+								nullptr,
+								nullptr,
+								{},
+								Node::Type::BOOL_LITERAL,
+								token);
 	node.basic_value.boolean_value = string_to_bool(token->value);
 	return node;
 }
@@ -199,82 +199,22 @@ Lang::Ast::Node Lang::Ast::Node::print_statement(std::shared_ptr<Node> expressio
 	return node;
 }
 
+
+Lang::Ast::Node Lang::Ast::Node::declaration(std::shared_ptr<Node> name,
+											 std::shared_ptr<Node> value,
+											 std::shared_ptr<Token> type) {
+	return Lang::Ast::Node(name,
+								value,
+								nullptr,
+								{},
+								type->type == TokenType::LET
+								? Type::DECLARATION
+								: Type::CONST_DECLARATION,
+								type);
+}
+
 std::any Lang::Ast::Node::interpret(Interpreter* interpreter) {
 	switch (this->type) {
-		case Type::INVALID:
-			break;
-		case Type::IDENTIFIER:
-			break;
-		case Type::NIL_LITERAL:
-			break;
-		case Type::BOOL_LITERAL:
-			break;
-		case Type::CHAR_LITERAL:
-			break;
-		case Type::STRING_LITERAL:
-			break;
-		case Type::INTEGER_LITERAL:
-			break;
-		case Type::FLOAT_LITERAL:
-			break;
-		case Type::TERNARY:
-			break;
-		case Type::ADDITION:
-			break;
-		case Type::SUBTRACTION:
-			break;
-		case Type::MULTIPLICATION:
-			break;
-		case Type::DIVISION:
-			break;
-		case Type::MODULO:
-			break;
-		case Type::POWER:
-			break;
-		case Type::EQUAL:
-			break;
-		case Type::NOT_EQUAL:
-			break;
-		case Type::GREATER_THAN:
-			break;
-		case Type::LESS_THAN:
-			break;
-		case Type::GREATER_THAN_EQUAL:
-			break;
-		case Type::LESS_THAN_EQUAL:
-			break;
-		case Type::NOT:
-			break;
-		case Type::MINUS:
-			break;
-		case Type::PRE_INCREMENT:
-			break;
-		case Type::POST_INCREMENT:
-			break;
-		case Type::PRE_DECREMENT:
-			break;
-		case Type::POST_DECREMENT:
-			break;
-		case Type::FUNCTION:
-			break;
-		case Type::IF:
-			break;
-		case Type::FOR:
-			break;
-		case Type::WHILE:
-			break;
-		case Type::DECLARATION:
-			break;
-		case Type::RETURN:
-			break;
-		case Type::BREAK:
-			break;
-		case Type::CONTINUE:
-			break;
-		case Type::BLOCK:
-			break;
-		case Type::GROUPING:
-			break;
 		case Type::PRINT:
 			std::cout << this->left->to_string() << std::endl;
 			break;

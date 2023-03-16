@@ -62,6 +62,7 @@ struct Node : public Interpretable {
 		FOR,
 		WHILE,
 		DECLARATION,
+		CONST_DECLARATION,
 		RETURN,
 		// @Todo CLASS,
 
@@ -105,7 +106,9 @@ struct Node : public Interpretable {
 											  std::shared_ptr<Token> token);
 	static Lang::Ast::Node print_statement(std::shared_ptr<Node> expression,
 										   std::shared_ptr<Token> token);
-
+	static Lang::Ast::Node declaration(std::shared_ptr<Node> name,
+											std::shared_ptr<Node> value,
+											std::shared_ptr<Token> type);
 
 	Node(std::shared_ptr<Lang::Ast::Node> left,
 						  std::shared_ptr<Lang::Ast::Node> right,

@@ -108,6 +108,8 @@ struct Token {
 };
 
 static const std::unordered_map<std::string, TokenType> types = {
+		{"let",      TokenType::LET,},
+		{"const",    TokenType::CONST,},
 		{"print",    TokenType::PRINT,}, // @Temporary
 		{"class",    TokenType::CLASS,},
 		{"super",    TokenType::SUPER,},
@@ -171,8 +173,6 @@ static const std::unordered_map<std::string, TokenType> types = {
 		{"}",        TokenType::RIGHT_BRACE,},
 		{"[",        TokenType::LEFT_BRACKET,},
 		{"]",        TokenType::RIGHT_BRACKET,},
-		{"let",      TokenType::LET,},
-		{"const",    TokenType::CONST,},
 };
 
 static const std::string& find_by_value(TokenType val) {

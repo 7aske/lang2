@@ -11,13 +11,13 @@ namespace Lang {
 
 Parser::Parser(const std::string& text, std::vector<Token> const& tokens)
 		: Iterator<std::shared_ptr<Token>>()
+		  , lexed(true)
 		  , text(text)
 		  , tokens(tokens) {
 
 	this->iter = this->tokens.begin();
 	this->end = this->tokens.end();
 	this->nodes.reserve(1024);
-	this->lexed = true;
 }
 
 std::vector<std::shared_ptr<Ast::Node>> Parser::get_nodes() const {
@@ -28,22 +28,26 @@ void Parser::parse() {
 	if (!lexed) {
 		lexer->lex();
 		tokens = lexer->get_tokens();
+		iter = tokens.begin();
+		end = tokens.end();
 	}
 
 	while (has_next()) {
 		try {
 			// @Todo implement synchronization
 			//   Synchronizing a recursive decent parser 6.3.3
-			nodes.push_back(parse_statement());
+			nodes.push_back(parse_declaration());
 		} catch (Parser_Location_Error& ex) {
 			std::cerr << MAGENTA << "Error occurred during parsing:" << std::endl << RESET;
-			print_location(text, ex.get_row(), ex.get_start_col(),
+			print_location(text, ex.get_row(),
+						   ex.get_start_col(),
 						   ex.get_end_col());
 			std::cerr << RED << ex.what() << std::endl << RESET;
 			return;
 		} catch (Parser_Token_Error& ex) {
 			std::cerr << MAGENTA << "Error occurred during parsing:" << std::endl << RESET;
-			print_location(text, ex.get_row(), ex.get_start_col(),
+			print_location(text, ex.get_row(),
+						   ex.get_start_col(),
 						   ex.get_end_col());
 			std::cerr << RED << ex.what() << std::endl << RESET;
 			return;
@@ -55,6 +59,14 @@ void Parser::parse() {
 
 std::shared_ptr<Ast::Node> Parser::parse_expression() {
 	return parse_equality();
+}
+
+std::shared_ptr<Ast::Node> Parser::parse_declaration() {
+	if (is_peek_of_type({TokenType::CONST, TokenType::LET})) {
+		return parse_variable_declaration();
+	}
+
+	return parse_statement();
 }
 
 std::shared_ptr<Ast::Node> Parser::parse_statement() {
@@ -193,6 +205,24 @@ std::shared_ptr<Ast::Node> Parser::parse_expression_statement() {
 
 Parser::Parser(const std::string& text): text(text) {
 	this->lexer = std::make_unique<Lexer>(text);
+}
+
+std::shared_ptr<Ast::Node> Parser::parse_variable_declaration() {
+	std::shared_ptr<Token> type = next(); // const or let
+	std::shared_ptr<Ast::Node> name =
+			std::make_shared<Ast::Node>(Ast::Node::identifier(next()));
+
+	std::shared_ptr<Ast::Node> value = nullptr;
+	if (is_peek_of_type({TokenType::EQUAL})) {
+		// @Todo create parse assignment and remove this skip
+		next();
+
+		value = parse_expression();
+	}
+
+	expect(TokenType::SEMICOLON);
+
+	return std::make_shared<Ast::Node>(Ast::Node::declaration(name, value, type));
 }
 
 }
